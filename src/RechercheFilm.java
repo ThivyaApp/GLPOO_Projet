@@ -22,6 +22,7 @@ public class RechercheFilm {
                         sb = new StringBuilder();
                         sb.setLength(0);
 
+
                     }else{
                         sb.append(typedLineArray.get(i).charAt(j));
                         if(j==typedLineArray.get(i).length()-1){
