@@ -44,10 +44,4 @@ public class RechercheFilm {
 
 }
 
-/*
-temp_tab = new ArrayList<>();
-                temp_tab.addAll(Arrays.asList(typedLineArray.get(i).trim().split(" "))); //Séparation espace, ajout tableau
-                tab.add(temp_tab);
- */
-
 
