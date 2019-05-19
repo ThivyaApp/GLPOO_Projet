@@ -13,26 +13,15 @@ public class RechercheFilm {
      * @param nomFichierSQLite emplacement de la base de donnée dans l'ordinateur
      */
     public RechercheFilm(String nomFichierSQLite){
-        //Connection conn = null;
+        String url = "jdbc:sqlite:"+nomFichierSQLite;
         try {
-            // database parameters
-            String url = "jdbc:sqlite:"+nomFichierSQLite;
             // create a connection to the database
             conn = DriverManager.getConnection(url);
             System.out.println("Connection to SQLite has been established.");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } /*finally {
-            try {
-                if (conn != null){
-                    System.out.println("closed");
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }*/
+        }
 
     }
 
@@ -52,8 +41,6 @@ public class RechercheFilm {
             System.out.println("yooo");
             System.out.println(e.getMessage());
         }
-
-        //LINK: http://www.sqlitetutorial.net/sqlite-java/select/
     }
 
     /**
