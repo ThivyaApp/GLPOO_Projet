@@ -2,6 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
 public class RechercheFilm {
 
     public ArrayList<String> typedLineArray = new ArrayList<String>();
@@ -34,13 +35,40 @@ public class RechercheFilm {
 
             // loop through the result set
             while (rs.next()) {
-                System.out.println(rs.getInt("id_film") +  "\t" +
-                        rs.getString("titre") + "\t");
+                //System.out.println(rs.getInt("id_film") +  "\t" + rs.getString("titre") + "\t");
             }
         }catch (SQLException e) {
             System.out.println("yooo");
             System.out.println(e.getMessage());
         }
+    }
+
+    private void etudeParametre(String param){
+        switch (param){
+            case "TITRE" :
+                System.out.println("methode titre");
+                break;
+            case "DE" :
+                System.out.println("methode de");
+                break;
+            case "AVEC" :
+                System.out.println("methode avec");
+                break;
+            case "PAYS" :
+                System.out.println("methode pays");
+                break;
+            case "EN" :
+                System.out.println("methode en");
+                break;
+            case "AVANT" :
+                System.out.println("methode avant");
+                break;
+            case "APRES" :
+                System.out.println("methode apres");
+                break;
+
+        }
+
     }
 
     /**
@@ -76,7 +104,31 @@ public class RechercheFilm {
             }
 
             for (int i = 0; i < tab.size(); i++) {
-                System.out.println("i="+i+" : " + tab.get(i)); }
+                if (tab.get(i).contains("TITRE")) {
+                    etudeParametre("TITRE");
+                }
+                if (tab.get(i).contains("DE")) {
+                    etudeParametre("DE");
+                }
+                if (tab.get(i).contains("AVEC")) {
+                    etudeParametre("AVEC");
+                }
+                if (tab.get(i).contains("PAYS")) {
+                    etudeParametre("PAYS");
+                }
+                if (tab.get(i).contains("EN")) {
+                    etudeParametre("EN");
+                }
+                if (tab.get(i).contains("AVANT")) {
+                    etudeParametre("AVANT");
+                }
+                if (tab.get(i).contains("APRES") || tab.get(i).contains("APRÈS ")) {
+                    etudeParametre("APRES");
+                }
+
+                System.out.println("i="+i+" : " + tab.get(i));
+            }
+
     }
 
 
