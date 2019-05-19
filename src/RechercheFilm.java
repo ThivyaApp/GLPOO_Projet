@@ -27,12 +27,12 @@ public class RechercheFilm {
     }
 
     public void selectAll(String id_film_val){
-        String sql = "SELECT id_film, titre FROM films WHERE id_film = ? LIMIT 100;";
-
+        String sql = "SELECT id_film, titre FROM films WHERE titre LIKE '?%' LIMIT 100;";
+        System.out.println("String vaut = " + id_film_val);
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
 
+            //pstmt.setString(1,id_film_val);
             pstmt.setString(1,id_film_val);
-            //pstmt.setString(1,name);
             ResultSet rs  = pstmt.executeQuery();
             // loop through the result set
             while (rs.next()) {

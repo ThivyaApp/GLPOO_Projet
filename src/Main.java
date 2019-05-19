@@ -6,14 +6,13 @@ public class Main {
 
         RechercheFilm rechercheFilm = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\Projet_GLPOO\\bdfilm.sqlite\\bdfilm.sqlite");
         /*
-        Scanner sc = new Scanner(System.in);
+        Scanner scan = new Scanner(System.in);
         System.out.println("Rechercher un film :");
-        String str = sc.nextLine();
-        System.out.println("Vous avez saisi : " + str);
+        String user_line = scan.nextLine();
+        System.out.println("Vous avez saisi : " + user_line);
+        rechercheFilm.readLineFromUser(user_line);*/
 
-        rechercheFilm.readLineFromUser(str);*/
-
-        rechercheFilm.selectAll("100");
+        rechercheFilm.selectAll("Om");
 
     }
 }
