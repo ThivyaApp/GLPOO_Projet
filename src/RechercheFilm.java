@@ -26,19 +26,20 @@ public class RechercheFilm {
 
     }
 
-    public void selectAll(){
-        String sql = "SELECT id_film, titre FROM films";
+    public void selectAll(String id_film_val){
+        String sql = "SELECT id_film, titre FROM films WHERE id_film = ? LIMIT 100;";
 
-        try (
-             Statement stmt  = conn.createStatement();
-             ResultSet rs    = stmt.executeQuery(sql)){
+        try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
 
+            pstmt.setString(1,id_film_val);
+            //pstmt.setString(1,name);
+            ResultSet rs  = pstmt.executeQuery();
             // loop through the result set
             while (rs.next()) {
-                //System.out.println(rs.getInt("id_film") +  "\t" + rs.getString("titre") + "\t");
+                System.out.println(rs.getInt("id_film") +  "\t" +
+                        rs.getString("titre") + "\t");
             }
         }catch (SQLException e) {
-            System.out.println("yooo");
             System.out.println(e.getMessage());
         }
     }
