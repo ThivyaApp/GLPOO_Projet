@@ -34,10 +34,10 @@ public class RechercheFilm {
 
             // loop through the result set
             while (rs.next()) {
-                System.out.println(rs.getInt("id") +  "\t" +
+                System.out.println(rs.getInt("id_film") +  "\t" +
                         rs.getString("titre") + "\t");
             }
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             System.out.println("yooo");
             System.out.println(e.getMessage());
         }
