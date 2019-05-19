@@ -125,7 +125,6 @@ public class RechercheFilm {
                 if (tab.get(i).contains("APRES") || tab.get(i).contains("APRÈS ")) {
                     etudeParametre("APRES");
                 }
-
                 System.out.println("i="+i+" : " + tab.get(i));
             }
 
