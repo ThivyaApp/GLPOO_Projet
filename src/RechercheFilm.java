@@ -5,13 +5,13 @@ import java.util.Arrays;
 
 public class RechercheFilm {
 
-    public ArrayList<String> typedLineArray = new ArrayList<String>();
-    public ArrayList<ArrayList<String>> tab = new ArrayList<>();
-    public ArrayList<String> temp_tab = new ArrayList<>();
+    public ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
+    public ArrayList<String> temp_tab = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
+    public ArrayList<ArrayList<String>> tab_final = new ArrayList<>();    //contient tableau final (tableau de temp_tab)
     Connection conn = null;
 
     /**
-     * @param nomFichierSQLite emplacement de la base de donnée dans l'ordinateur
+     * @param nomFichierSQLite emplacement de la base de donnée dans l'ordinateur (chemin)
      */
     public RechercheFilm(String nomFichierSQLite){
         String url = "jdbc:sqlite:"+nomFichierSQLite;
@@ -73,61 +73,51 @@ public class RechercheFilm {
     }
 
     /**
-     * Permet de mettre chaque mot entré par l'utilisateur dans des tableaux
+     * Permet de créer un tableau pour separer les éléments saisies par l'utilisateur
      * @param TypedLine Ligne entrée par l'utilisateur
      */
-    public void readLineFromUser(String TypedLine){
-            //typedLineArray.addAll(Arrays.asList(TypedLine.split(",|\\.")));
-            StringBuilder sb = new StringBuilder();
-            typedLineArray.addAll(Arrays.asList(TypedLine.trim().split(",")));     //Séparation par virgule, ajout dans tableau
+    public void readLineFromUser(String TypedLine) {
+        //POSSIBILITE : transformer le OU en point
+        //typedLineArray.addAll(Arrays.asList(TypedLine.split(",|\\.")));
+        typedLineArray.addAll(Arrays.asList(TypedLine.trim().split(",")));     //Séparation par virgule, ajout dans tableau
 
-            //System.out.println("size: "+ typedLineArray.size());
-            for (int i = 0; i< typedLineArray.size();i++) {
-                for(int j =0; j < typedLineArray.get(i).length(); j++){
-                    if(Character.isSpaceChar(typedLineArray.get(i).charAt(j))){
-                        if (sb.length()!=0){
-                            temp_tab.add(String.valueOf(sb));
-                        }
-                        sb = new StringBuilder();
-                        sb.setLength(0);
-
-                    }else{
-                        sb.append(typedLineArray.get(i).charAt(j));
-                        if(j==typedLineArray.get(i).length()-1){
-                            temp_tab.add(String.valueOf(sb));
-                            sb = new StringBuilder();
-                            sb.setLength(0);
-                        }
-                    }
-                }
-                tab.add(temp_tab);
-                temp_tab = new ArrayList<>();
+        String[] hey;
+        for (int i = 0; i < typedLineArray.size(); i++) {
+            hey = typedLineArray.get(i).trim().split(" ");
+            for(int w=0; w<hey.length;w++){
+                if(hey[w].equals("")){}
+                else temp_tab.add(hey[w]);
             }
+            tab_final.add(temp_tab);
+            temp_tab = new ArrayList<>();
+        }
+        System.out.println(tab_final);
 
-            for (int i = 0; i < tab.size(); i++) {
-                if (tab.get(i).contains("TITRE")) {
-                    etudeParametre("TITRE");
-                }
-                if (tab.get(i).contains("DE")) {
-                    etudeParametre("DE");
-                }
-                if (tab.get(i).contains("AVEC")) {
-                    etudeParametre("AVEC");
-                }
-                if (tab.get(i).contains("PAYS")) {
-                    etudeParametre("PAYS");
-                }
-                if (tab.get(i).contains("EN")) {
-                    etudeParametre("EN");
-                }
-                if (tab.get(i).contains("AVANT")) {
-                    etudeParametre("AVANT");
-                }
-                if (tab.get(i).contains("APRES") || tab.get(i).contains("APRÈS ")) {
-                    etudeParametre("APRES");
-                }
-                System.out.println("i="+i+" : " + tab.get(i));
+
+        /*for (int i = 0; i < tab.size(); i++) {
+            if (tab.get(i).contains("TITRE")) {
+                etudeParametre("TITRE");
             }
+            if (tab.get(i).contains("DE")) {
+                etudeParametre("DE");
+            }
+            if (tab.get(i).contains("AVEC")) {
+                etudeParametre("AVEC");
+            }
+            if (tab.get(i).contains("PAYS")) {
+                etudeParametre("PAYS");
+            }
+            if (tab.get(i).contains("EN")) {
+                etudeParametre("EN");
+            }
+            if (tab.get(i).contains("AVANT")) {
+                etudeParametre("AVANT");
+            }
+            if (tab.get(i).contains("APRES") || tab.get(i).contains("APRÈS ")) {
+                etudeParametre("APRES");
+            }
+            System.out.println("i=" + i + " : " + tab.get(i));
+        }*/
 
     }
 

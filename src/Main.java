@@ -3,13 +3,10 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args){
 
-
         RechercheFilm rechercheFilm = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\Projet_GLPOO\\bdfilm.sqlite\\bdfilm.sqlite");
-        /*
-        Scanner scan = new Scanner(System.in);
+        /*Scanner scan = new Scanner(System.in);
         System.out.println("Rechercher un film :");
         String user_line = scan.nextLine();
-        System.out.println("Vous avez saisi : " + user_line);
         rechercheFilm.readLineFromUser(user_line);*/
 
         rechercheFilm.selectAll("Om");
