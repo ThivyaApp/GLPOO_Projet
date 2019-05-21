@@ -68,6 +68,8 @@ public class RechercheFilm {
      * Permet de créer un tableau pour separer les éléments saisies par l'utilisateur
      * @param TypedLine Ligne entrée par l'utilisateur
      */
+
+
     public void readLineFromUser(String TypedLine) {
         ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
         ArrayList<String> temp_tab = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
@@ -131,21 +133,21 @@ public class RechercheFilm {
         }
     }
 
-    public void selectAll(String id_film_val){
+    public void selectAll(){
         //String sql = EN_SQL;
-        String sql = "select id_film\n" +
-                "from films\n" +
-                "WHERE annee LIKE '2000'";
+        String a = "'";
+        String sql = "select id_film,titre " +
+                "from films " +
+                "WHERE titre LIKE ? ";
+        String test = "agora";
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
 
-            //pstmt.setString(1,id_film_val);
-            //pstmt.setString(1,"2000");
+            pstmt.setString(1,test);
             ResultSet rs  = pstmt.executeQuery();
             // loop through the result set
             while (rs.next()) {
-                System.out.println(rs.getInt("id_film"));
-                        /*+  "\t" +
-                        rs.getString("titre") + "\t");*/
+                System.out.println(rs.getInt("id_film") +  "\t" +
+                        rs.getString("titre") + "\t");
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());

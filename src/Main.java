@@ -9,7 +9,7 @@ public class Main {
         String user_line = scan.nextLine();
         rechercheFilm.readLineFromUser(user_line);*/
 
-        rechercheFilm.selectAll("158");
+        rechercheFilm.selectAll();
 
     }
 }
