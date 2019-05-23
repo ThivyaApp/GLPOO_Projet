@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args){
 
-        RechercheFilm rechercheFilm = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\Projet_GLPOO\\bdfilm.sqlite\\bdfilm.sqlite");
+        RechercheFilm rechercheFilm = new RechercheFilm("/Users/douglaslopeze/IdeaProjects/GLPOO_Projet/bdfilm.sqlite");
         Scanner scan = new Scanner(System.in);
         System.out.println("Rechercher un film :");
         String user_line = scan.nextLine();
@@ -11,7 +11,6 @@ public class Main {
         //rechercheFilm.selectAll();
         rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
 
-        rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
         System.out.println(rechercheFilm.constructionSQL());
         /*String a = "Avec elle houhou";
         a = a + " yoo";

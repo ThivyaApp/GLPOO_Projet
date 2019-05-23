@@ -84,6 +84,7 @@ public class RechercheFilm {
             }
             tab_final.add(temp_tab_nonnull);
             temp_tab_nonnull = new ArrayList<>();
+            //System.out.println(tab_final.get(i));
         }
 
         for (int i = 0; i < tab_final.size(); i++) {
@@ -154,25 +155,25 @@ public class RechercheFilm {
     public String etudeParametre(String param){
         String SQL_req = new String();
         switch (param){
-            case "TITRE" :
+            case "titre" :
                 SQL_req = TITRE_SQL;
                 break;
-            case "DE" :
+            case "de" :
                 SQL_req = DE_SQL;
                 break;
-            case "AVEC" :
+            case "avec" :
                 SQL_req = AVEC_SQL;
                 break;
-            case "PAYS" :
+            case "pays" :
                 SQL_req = PAYS_SQL;
                 break;
-            case "EN" :
+            case "en" :
                 SQL_req = EN_SQL;
                 break;
-            case "AVANT" :
+            case "avant" :
                 SQL_req = AVANT_SQL;
                 break;
-            case "APRES" :
+            case "apres" :
                 SQL_req = APRES_SQL;
                 break;
         }
@@ -197,6 +198,13 @@ public class RechercheFilm {
         for (int i = 0; i<sep.size();i++){
             cond1 = tab_final.get(j).get(0);
             cond2 = tab_final.get(j+1).get(0);
+
+            // debug
+            System.out.println("\u001B[34m cond 1 : " + cond1);
+            System.out.println("\u001B[33m cond 2 : " + cond2);
+            System.out.println("\u001B[34m etude parametre cond1 :" + etudeParametre(cond1));
+            System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
+
             if(sep.get(i)==","){
                 if((i==0 && sep.size() != 1) || (sep.get(i-1).equals(sep.get(i)))){
                     et = etudeParametre(cond1) + "\nINTERSECT\n";
