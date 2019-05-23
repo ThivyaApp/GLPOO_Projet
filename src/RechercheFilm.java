@@ -9,66 +9,57 @@ public class RechercheFilm {
     Connection conn = null;
 
     //Recherche acteur
-    public String AVEC_SQL = "select g.id_film\n" +
-            "from personnes p\n" +
-            "    join generique g \n" +
-            "    on g.id_personne = p.id_personne\n" +
-            "        WHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        AND role = 'A'\n"+
-            "        LIMIT 100;";
+    public String AVEC_SQL = "\tselect g.id_film\n" +
+            "\tfrom personnes p\n" +
+            "\t\tjoin generique g \n" +
+            "\t\ton g.id_personne = p.id_personne\n" +
+            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tAND role = 'A'";
 
     //Recherche réalisateur
-    public String DE_SQL = "select g.id_film\n" +
-            "from personnes p\n" +
-            "    join generique g \n" +
-            "    on g.id_personne = p.id_personne\n" +
-            "        WHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "        AND role = 'R'\n"+
-            "        LIMIT 100;";
+    public String DE_SQL = "\tselect g.id_film\n" +
+            "\tfrom personnes p\n" +
+            "\t\tjoin generique g \n" +
+            "\t\ton g.id_personne = p.id_personne\n" +
+            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tAND role = 'R'";
 
     //Recherche titre
-    public String TITRE_SQL = "select id_film\n"+
-                            "from recherche_titre\n"+
-                            "where titre match '?'\n"+
-                            "LIMIT 100;";
+    public String TITRE_SQL = "\tselect id_film\n"+
+                            "\tfrom recherche_titre\n"+
+                            "\twhere titre match ?";
 
     //Recherche pays
-    public String PAYS_SQL = "select f.id_film\n"+
-                            "from films f\n"+
-                            "join pays p\n"+
-                            "on f.pays = p.code\n"+
-                            "WHERE f.pays LIKE '?'\n"+
-                            "OR p.nom LIKE '?'\n"+
-                             "LIMIT 100;";
+    public String PAYS_SQL = "\tselect f.id_film\n"+
+                            "\tfrom films f\n"+
+                            "\t\tjoin pays p\n"+
+                            "\t\ton f.pays = p.code\n"+
+                            "\t\tWHERE f.pays LIKE ?\n"+
+                            "\t\tOR p.nom LIKE ?";
 
     //Recherche année
-    public String EN_SQL =  "select id_film\n"+
-                            "from films\n"+
-                            "WHERE annee LIKE '?'\n"+
-                            "LIMIT 100;";
+    public String EN_SQL =  "\tselect id_film\n"+
+                            "\tfrom films\n"+
+                            "\tWHERE annee LIKE ?";
 
     //Recherche année AVANT
-    public String AVANT_SQL = "select id_film\n" +
-            "from films\n" +
-            "    WHERE annee < '?'\n"+
-            "    LIMIT 100;";
+    public String AVANT_SQL = "\tselect id_film" +
+            "\tfrom films\n" +
+            "\tWHERE annee < ?";
 
     //Recherche année APRES
-    public String APRES_SQL = "select id_film\n" +
-            "from films\n" +
-            "    WHERE annee > '?'\n"+
-            "    LIMIT 100;";
+    public String APRES_SQL = "\tselect id_film" +
+            "\tfrom films\n" +
+            "\tWHERE annee > ? ";
 
     /**
      * Permet de créer un tableau pour separer les éléments saisies par l'utilisateur
      * @param TypedLine Ligne entrée par l'utilisateur
      */
-
-
     public void lectureLigneUtilisateur(String TypedLine) {
 
         ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
@@ -193,7 +184,7 @@ public class RechercheFilm {
     public String constructionSQL(){
         String et ,ou ,cond1,cond2 ;
         int j = 0;
-        String SQL = "with filtre as(";
+        String SQL = "with filtre as(\n";
 
         for (int i = 0; i<sep.size();i++){
             cond1 = tab_final.get(j).get(0);
@@ -227,7 +218,7 @@ public class RechercheFilm {
             if(j < tab_final.size())j++;
         }
 
-        SQL+= ")\n" +
+        SQL+= "\n)\n" +
                 "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
                 "group_concat(a.titre, ' | ') as autres_titres,\n" +
                 "p.prenom, p.nom, g.role\n" +
@@ -242,7 +233,8 @@ public class RechercheFilm {
                 "    on g.id_film = f.id_film\n" +
                 "    join personnes p\n" +
                 "    on p.id_personne = g.id_personne\n" +
-                "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role";
+                "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
+                "    LIMIT 100;";
         return SQL;
     }
 }
