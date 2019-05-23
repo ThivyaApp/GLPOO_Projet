@@ -5,7 +5,7 @@ public class Main {
 
         RechercheFilm rechercheFilm = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\Projet_GLPOO\\bdfilm.sqlite\\bdfilm.sqlite");
 
-        //rechercheFilm.lectureLigneUtilisateur(user_line.toLowerCase().replaceAll(" ou "," * "));
+        rechercheFilm.lectureLigneUtilisateur();
         //rechercheFilm.selectAll();
         //rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
 
