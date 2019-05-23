@@ -11,6 +11,7 @@ public class Main {
         //rechercheFilm.selectAll();
         rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
 
+        rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
         System.out.println(rechercheFilm.constructionSQL());
         /*String a = "Avec elle houhou";
         a = a + " yoo";

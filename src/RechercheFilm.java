@@ -182,12 +182,11 @@ public class RechercheFilm {
 
     public ArrayList<String> sep = new ArrayList<>();   //tableau comportant les virgules(et), étoiles(ou)
 
-    public ArrayList recupSeparateur(String chaine){
+    public void recupSeparateur(String chaine){
         for(int s=0;s<chaine.length(); s++){
             if(chaine.charAt(s)==',') sep.add(",");
             else if(chaine.charAt(s)=='*') sep.add("*");
         }
-        return sep;
     }
 
     public String constructionSQL(){
