@@ -8,10 +8,10 @@ public class Main {
         System.out.println("Rechercher un film :");
         String user_line = scan.nextLine();
         rechercheFilm.lectureLigneUtilisateur(user_line.toLowerCase().replaceAll(" ou "," * "));
-        //System.out.println(user_line.toLowerCase().replaceAll(" ou "," * "));
         //rechercheFilm.selectAll();
         rechercheFilm.recupSeparateur(user_line.toLowerCase().replaceAll(" ou "," * "));
 
+        System.out.println(rechercheFilm.constructionSQL());
         /*String a = "Avec elle houhou";
         a = a + " yoo";
         System.out.println("a = " + a);*/

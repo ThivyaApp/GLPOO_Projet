@@ -191,18 +191,34 @@ public class RechercheFilm {
     }
 
     public String constructionSQL(){
-        /*String ou = "select id_film\n" +
-                "from(" + condition + "UNION"; */
-
+        String et ,ou ,cond1,cond2 ;
+        int j = 0;
         String SQL = "with filtre as(";
 
         for (int i = 0; i<sep.size();i++){
+            cond1 = tab_final.get(j).get(0);
+            cond2 = tab_final.get(j+1).get(0);
+            if(sep.get(i)==","){
+                if((i==0 && sep.size() != 1) || (sep.get(i-1).equals(sep.get(i)))){
+                    et = etudeParametre(cond1) + "\nINTERSECT\n";
+                }else if(sep.size() == 1){
+                    et = etudeParametre(cond1)+ "\nINTERSECT\n" + etudeParametre(cond2);
+                } else {
+                    et = "INTERSECT\n" + etudeParametre(cond1);
+                }
+            SQL += et;
+            } else {
+                if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){
+                    ou = etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2);
+                    if(j < tab_final.size())j++;
+                } else {
+                    ou = "\nUNION\n" + etudeParametre(cond1);
+                }
+            SQL += ou;
+            }
 
+            if(j < tab_final.size())j++;
         }
-
-
-
-
 
         SQL+= ")\n" +
                 "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
