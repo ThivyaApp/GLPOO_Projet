@@ -56,6 +56,7 @@ public class RechercheFilm {
             "\tfrom films\n" +
             "\tWHERE annee > ? ";
 
+
     /**
      * @return Retourne la ligne saisie par l'utilisateur après lui avoir demandé
      */
@@ -100,10 +101,6 @@ public class RechercheFilm {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        lectureLigneUtilisateur();
-        recupSeparateur(demandeUtilisateur());
-        constructionSQL();
-
     }
 
     public ArrayList<String> sep = new ArrayList<>();   //tableau comportant les virgules(et), étoiles(ou)
