@@ -87,6 +87,7 @@ public class RechercheFilm {
             temp_tab_nonnull = new ArrayList<>();
             //System.out.println(tab_final.get(i));
         }
+        recupSeparateur(TypedLine);
     }
 
     /**
@@ -100,9 +101,6 @@ public class RechercheFilm {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        lectureLigneUtilisateur();
-        recupSeparateur(demandeUtilisateur());
-        constructionSQL();
 
     }
 
@@ -120,39 +118,48 @@ public class RechercheFilm {
         int j = 0;
         String SQL = "with filtre as(\n";
 
+        System.out.println("sep size = " + sep.size());
+        String bleu = "\u001B[34m";
+        String jaune = "\u001B[33m";
+        String vert = "\u001B[32m";
+        String blanc = "\u001B[0m";
+
         for (int i = 0; i<sep.size();i++){
             cond1 = tab_final.get(j).get(0);
             cond2 = tab_final.get(j+1).get(0);
 
             // debug
-            System.out.println("\u001B[34m cond 1 : " + cond1);
-            System.out.println("\u001B[33m cond 2 : " + cond2);
-            System.out.println("\u001B[34m etude parametre cond1 :" + etudeParametre(cond1));
-            System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
+
+            System.out.println(bleu + cond1);
+            System.out.println(jaune + cond2 + blanc);
+            //System.out.println("\u001B[34m etude parametre cond1 :" + etudeParametre(cond1));
+            //System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
 
             if(sep.get(i)==","){
-                if((i==0 && sep.size() > 2) || (i > 0 && (sep.get(i-1).equals(sep.get(i))))){
-                    et = etudeParametre(cond1) + "\nINTERSECT\n";
-                }else if(sep.size() == 2){
-                    et = etudeParametre(cond1)+ "\nINTERSECT\n" + etudeParametre(cond2);
-                } else {
-                    et = "INTERSECT\n" + etudeParametre(cond1);
+                if((i == 0 && sep.size() > 1) || (i < sep.size()-1 )){ // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
+                    et = vert + etudeParametre(cond1);
+                    if(i != sep.size()-1) et  += "\nINTERSECT\n" + blanc; // si il est vraiment au milieu on rajoute INTERSECT
+                }else if(sep.size() == 1 || ((i == sep.size()-1) && sep.get(i).equals(sep.get(i - 1)))){ // sinon si il est le seul ou le dernier sachant que le separateur precedent etait ","
+                    et = bleu + etudeParametre(cond1)+ "\nINTERSECT\n" + etudeParametre(cond2) + blanc;
+                } else { // sinon si il est le dernier
+                    if(!sep.get(i).equals(sep.get(i - 1))) et = jaune + "\nINTERSECT\n" + etudeParametre(cond2) + blanc; // si avant c'était pas une ","
+                    else et = jaune + etudeParametre(cond1) + blanc;
                 }
-            SQL += et;
+                SQL += et;
             } else {
-                if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){
-                    ou = etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2);
+                if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){ // si c'est le premier ou que le precedent était ","
+                    ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc ;
                     //if(j < tab_final.size())j++;
                 } else {
-                    ou = "\nUNION\n" + etudeParametre(cond2);
+                    ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
                 }
-            SQL += ou;
+                SQL += ou;
             }
 
             if(j < tab_final.size())j++;
         }
 
-        SQL+= "\n)\n" +
+        SQL+= blanc + ")\n" +
                 "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
                 "group_concat(a.titre, ' | ') as autres_titres,\n" +
                 "p.prenom, p.nom, g.role\n" +
