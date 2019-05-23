@@ -128,9 +128,17 @@ public class RechercheFilm {
             cond1 = tab_final.get(j).get(0);
             cond2 = tab_final.get(j+1).get(0);
 
+            System.out.println(bleu + cond1);
+            System.out.println(jaune + cond2 + blanc);
+
+            if(!cond2.equals("avec")
+                    || !cond2.equals("avant") || !cond2.equals("de") || !cond2.equals("pays")
+                    || !cond2.equals("titre") || !cond2.equals("en") || !cond2.equals("apres") )  cond2 = tab_final.get(j).get(0);
+
             // debug
 
             System.out.println(bleu + cond1);
+
             System.out.println(jaune + cond2 + blanc);
             //System.out.println("\u001B[34m etude parametre cond1 :" + etudeParametre(cond1));
             //System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
