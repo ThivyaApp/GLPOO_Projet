@@ -206,9 +206,9 @@ public class RechercheFilm {
             System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
 
             if(sep.get(i)==","){
-                if((i==0 && sep.size() != 1) || (sep.get(i-1).equals(sep.get(i)))){
+                if((i==0 && sep.size() > 2) || (i > 0 && (sep.get(i-1).equals(sep.get(i))))){
                     et = etudeParametre(cond1) + "\nINTERSECT\n";
-                }else if(sep.size() == 1){
+                }else if(sep.size() == 2){
                     et = etudeParametre(cond1)+ "\nINTERSECT\n" + etudeParametre(cond2);
                 } else {
                     et = "INTERSECT\n" + etudeParametre(cond1);
@@ -217,9 +217,9 @@ public class RechercheFilm {
             } else {
                 if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){
                     ou = etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2);
-                    if(j < tab_final.size())j++;
+                    //if(j < tab_final.size())j++;
                 } else {
-                    ou = "\nUNION\n" + etudeParametre(cond1);
+                    ou = "\nUNION\n" + etudeParametre(cond2);
                 }
             SQL += ou;
             }
