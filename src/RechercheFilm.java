@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class RechercheFilm {
 
@@ -8,26 +9,24 @@ public class RechercheFilm {
     Connection conn = null;
 
     //Recherche acteur
-    public String AVEC_SQL = "select g.id_film, p.id_personne, p.nom, p.prenom, g.role\n" +
+    public String AVEC_SQL = "select g.id_film\n" +
             "from personnes p\n" +
             "    join generique g \n" +
             "    on g.id_personne = p.id_personne\n" +
-            "        WHERE (nom_sans_accent LIKE 'Kajol' AND prenom_sans_accent LIKE '%')\n" +
-            "        OR (prenom_sans_accent LIKE 'Kajol%' AND nom_sans_accent LIKE '')\n" +
-            "        OR (prenom_sans_accent LIKE 'Kajol%')\n" +
-            "        OR (nom_sans_accent LIKE 'Kajol')\n" +
+            "        WHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
             "        AND role = 'A'\n"+
             "        LIMIT 100;";
 
     //Recherche réalisateur
-    public String DE_SQL = "select g.id_film, p.id_personne, p.nom, p.prenom, g.role\n" +
+    public String DE_SQL = "select g.id_film\n" +
             "from personnes p\n" +
             "    join generique g \n" +
             "    on g.id_personne = p.id_personne\n" +
-            "        WHERE (nom_sans_accent LIKE 'Kajol' AND prenom_sans_accent LIKE '%')\n" +
-            "        OR (prenom_sans_accent LIKE 'Kajol%' AND nom_sans_accent LIKE '')\n" +
-            "        OR (prenom_sans_accent LIKE 'Kajol%')\n" +
-            "        OR (nom_sans_accent LIKE 'Kajol')\n" +
+            "        WHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "        OR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
             "        AND role = 'R'\n"+
             "        LIMIT 100;";
 
@@ -53,13 +52,13 @@ public class RechercheFilm {
                             "LIMIT 100;";
 
     //Recherche année AVANT
-    public String AVANT_SQL = "select id_film, titre, annee\n" +
+    public String AVANT_SQL = "select id_film\n" +
             "from films\n" +
             "    WHERE annee < '?'\n"+
             "    LIMIT 100;";
 
     //Recherche année APRES
-    public String APRES_SQL = "select id_film, titre, annee\n" +
+    public String APRES_SQL = "select id_film\n" +
             "from films\n" +
             "    WHERE annee > '?'\n"+
             "    LIMIT 100;";
@@ -70,22 +69,21 @@ public class RechercheFilm {
      */
 
 
-    public void readLineFromUser(String TypedLine) {
+    public void lectureLigneUtilisateur(String TypedLine) {
+
         ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
-        ArrayList<String> temp_tab = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
-        String[] hey;   //contient split en fonction d'un espace des lignes de typedLineArray avec valeur null
-        //POSSIBILITE : transformer le OU en point
-        //typedLineArray.addAll(Arrays.asList(TypedLine.split(",|\\.")));
-        typedLineArray.addAll(Arrays.asList(TypedLine.trim().split(",")));     //Séparation par virgule, ajout dans tableau
+        ArrayList<String> temp_tab_nonnull = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
+        String[] temp_tab_null;   //contient split en fonction d'un espace des lignes de typedLineArray avec valeur null
+        typedLineArray.addAll(Arrays.asList(TypedLine.trim().split(",|\\*")));     //Séparation par virgule, ajout dans tableau
 
         for (int i = 0; i < typedLineArray.size(); i++) {
-            hey = typedLineArray.get(i).trim().split(" ");
-            for(int w=0; w<hey.length;w++){
-                if(hey[w].equals("")){}
-                else temp_tab.add(hey[w]);
+            temp_tab_null = typedLineArray.get(i).trim().split(" ");
+            for(int w=0; w<temp_tab_null.length;w++){
+                if(temp_tab_null[w].equals("")){}
+                else temp_tab_nonnull.add(temp_tab_null[w]);
             }
-            tab_final.add(temp_tab);
-            temp_tab = new ArrayList<>();
+            tab_final.add(temp_tab_nonnull);
+            temp_tab_nonnull = new ArrayList<>();
         }
 
         for (int i = 0; i < tab_final.size(); i++) {
@@ -121,7 +119,7 @@ public class RechercheFilm {
     }
 
     /**
-     * @param nomFichierSQLite emplacement de la base de donnée dans l'ordinateur (chemin)
+     * @param nomFichierSQLite emplacement de la base de données dans l'ordinateur (chemin)
      */
     public RechercheFilm(String nomFichierSQLite){
         String url = "jdbc:sqlite:"+nomFichierSQLite;
@@ -134,18 +132,17 @@ public class RechercheFilm {
     }
 
     public void selectAll(){
-        //String sql = EN_SQL;
-        String a = "'";
         String sql = "select id_film,titre " +
                 "from films " +
                 "WHERE titre LIKE ? ";
+
         String test = "agora";
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-
             pstmt.setString(1,test);
+
             ResultSet rs  = pstmt.executeQuery();
             // loop through the result set
-            while (rs.next()) {
+            while (rs.next()){
                 System.out.println(rs.getInt("id_film") +  "\t" +
                         rs.getString("titre") + "\t");
             }
@@ -154,36 +151,75 @@ public class RechercheFilm {
         }
     }
 
-    private void etudeParametre(String param){
+    public String etudeParametre(String param){
+        String SQL_req = new String();
         switch (param){
             case "TITRE" :
-                System.out.println("methode titre");
+                SQL_req = TITRE_SQL;
                 break;
             case "DE" :
-                System.out.println("methode de");
+                SQL_req = DE_SQL;
                 break;
             case "AVEC" :
-                System.out.println("methode avec");
+                SQL_req = AVEC_SQL;
                 break;
             case "PAYS" :
-                System.out.println("methode pays");
+                SQL_req = PAYS_SQL;
                 break;
             case "EN" :
-                System.out.println("methode en");
+                SQL_req = EN_SQL;
                 break;
             case "AVANT" :
-                System.out.println("methode avant");
+                SQL_req = AVANT_SQL;
                 break;
             case "APRES" :
-                System.out.println("methode apres");
+                SQL_req = APRES_SQL;
                 break;
         }
+        return SQL_req;
+    }
+
+
+    public ArrayList<String> sep = new ArrayList<>();   //tableau comportant les virgules(et), étoiles(ou)
+
+    public ArrayList recupSeparateur(String chaine){
+        for(int s=0;s<chaine.length(); s++){
+            if(chaine.charAt(s)==',') sep.add(",");
+            else if(chaine.charAt(s)=='*') sep.add("*");
+        }
+        return sep;
     }
 
     public String constructionSQL(){
-        String SQL = "oui";
+        /*String ou = "select id_film\n" +
+                "from(" + condition + "UNION"; */
+
+        String SQL = "with filtre as(";
+
+        for (int i = 0; i<sep.size();i++){
+
+        }
+
+
+
+
+
+        SQL+= ")\n" +
+                "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
+                "group_concat(a.titre, ' | ') as autres_titres,\n" +
+                "p.prenom, p.nom, g.role\n" +
+                "from filtre\n" +
+                "    join films f\n" +
+                "    on f.id_film = filtre.id_film\n" +
+                "    join pays py\n" +
+                "    on py.code = f.pays\n" +
+                "    left join autres_titres a\n" +
+                "    on a.id_film = f.id_film\n" +
+                "    join generique g\n" +
+                "    on g.id_film = f.id_film\n" +
+                "    join personnes p\n" +
+                "    on p.id_personne = g.id_personne\n" +
+                "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role";
         return SQL;
     }
 }
-
-
