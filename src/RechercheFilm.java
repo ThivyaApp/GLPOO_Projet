@@ -118,7 +118,7 @@ public class RechercheFilm {
         int j = 0;
         String SQL = "with filtre as(\n";
 
-        System.out.println("sep size = " + sep.size());
+        //System.out.println("sep size = " + sep.size());
         String bleu = "\u001B[34m";
         String jaune = "\u001B[33m";
         String vert = "\u001B[32m";
@@ -128,20 +128,16 @@ public class RechercheFilm {
             cond1 = tab_final.get(j).get(0);
             cond2 = tab_final.get(j+1).get(0);
 
-            System.out.println(bleu + cond1);
-            System.out.println(jaune + cond2 + blanc);
+            if(!cond2.equals("avec") && !cond2.equals("avant") && !cond2.equals("de") && !cond2.equals("pays")
+                    && !cond2.equals("titre") && !cond2.equals("en") && !cond2.equals("apres") )  cond2 = tab_final.get(j).get(0);
 
-            if(!cond2.equals("avec")
-                    || !cond2.equals("avant") || !cond2.equals("de") || !cond2.equals("pays")
-                    || !cond2.equals("titre") || !cond2.equals("en") || !cond2.equals("apres") )  cond2 = tab_final.get(j).get(0);
+            if(!cond1.equals("avec") && !cond1.equals("avant") && !cond1.equals("de") && !cond1.equals("pays")
+                    && !cond1.equals("titre") && !cond1.equals("en") && !cond1.equals("apres") && j > 0 )  cond1 = tab_final.get(j-1).get(0);
 
             // debug
 
-            System.out.println(bleu + cond1);
-
-            System.out.println(jaune + cond2 + blanc);
-            //System.out.println("\u001B[34m etude parametre cond1 :" + etudeParametre(cond1));
-            //System.out.println("\u001B[33m etude parametre cond2 :" + etudeParametre(cond2) + "\u001B[0m\n");
+            //System.out.println(bleu + cond1);
+            //System.out.println(jaune + cond2 + blanc);
 
             if(sep.get(i)==","){
                 if((i == 0 && sep.size() > 1) || (i < sep.size()-1 )){ // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
@@ -157,7 +153,6 @@ public class RechercheFilm {
             } else {
                 if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){ // si c'est le premier ou que le precedent était ","
                     ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc ;
-                    //if(j < tab_final.size())j++;
                 } else {
                     ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
                 }

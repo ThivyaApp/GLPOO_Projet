@@ -7,7 +7,6 @@ public class Main {
 
         rechercheFilm.lectureLigneUtilisateur();
         //rechercheFilm.selectAll();
-
         System.out.println(rechercheFilm.constructionSQL());
 
 
