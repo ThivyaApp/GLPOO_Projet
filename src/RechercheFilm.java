@@ -57,11 +57,21 @@ public class RechercheFilm {
             "\tWHERE annee > ? ";
 
     /**
-     * Permet de créer un tableau pour separer les éléments saisies par l'utilisateur
-     * @param TypedLine Ligne entrée par l'utilisateur
+     * @return Retourne la ligne saisie par l'utilisateur après lui avoir demandé
      */
-    public void lectureLigneUtilisateur(String TypedLine) {
+    public String demandeUtilisateur(){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Rechercher un film :");
+        String user_line = scan.nextLine().toLowerCase().replaceAll(" ou "," * ");
+        return user_line;
+    }
 
+    /**
+     * Permet de créer un tableau pour separer les éléments saisies par l'utilisateur
+     */
+    public void lectureLigneUtilisateur() {
+
+        String TypedLine = demandeUtilisateur();
         ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
         ArrayList<String> temp_tab_nonnull = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
         String[] temp_tab_null;   //contient split en fonction d'un espace des lignes de typedLineArray avec valeur null
@@ -77,37 +87,6 @@ public class RechercheFilm {
             temp_tab_nonnull = new ArrayList<>();
             //System.out.println(tab_final.get(i));
         }
-
-        for (int i = 0; i < tab_final.size(); i++) {
-            if (tab_final.get(i).get(0).toUpperCase().contains("TITRE")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("TITRE");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("DE")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("DE");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("AVEC")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("AVEC");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("PAYS")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("PAYS");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("EN")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("EN");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("AVANT")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("AVANT");
-            }
-            if (tab_final.get(i).get(0).toUpperCase().contains("APRES") || tab_final.get(i).contains("APRÈS ")) {
-                System.out.println(tab_final.get(i).get(0));
-                etudeParametre("APRES");
-            }
-        }
     }
 
     /**
@@ -121,56 +100,11 @@ public class RechercheFilm {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        lectureLigneUtilisateur();
+        recupSeparateur(demandeUtilisateur());
+        constructionSQL();
+
     }
-
-    public void selectAll(){
-        String sql = "select id_film,titre " +
-                "from films " +
-                "WHERE titre LIKE ? ";
-
-        String test = "agora";
-        try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-            pstmt.setString(1,test);
-
-            ResultSet rs  = pstmt.executeQuery();
-            // loop through the result set
-            while (rs.next()){
-                System.out.println(rs.getInt("id_film") +  "\t" +
-                        rs.getString("titre") + "\t");
-            }
-        }catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public String etudeParametre(String param){
-        String SQL_req = new String();
-        switch (param){
-            case "titre" :
-                SQL_req = TITRE_SQL;
-                break;
-            case "de" :
-                SQL_req = DE_SQL;
-                break;
-            case "avec" :
-                SQL_req = AVEC_SQL;
-                break;
-            case "pays" :
-                SQL_req = PAYS_SQL;
-                break;
-            case "en" :
-                SQL_req = EN_SQL;
-                break;
-            case "avant" :
-                SQL_req = AVANT_SQL;
-                break;
-            case "apres" :
-                SQL_req = APRES_SQL;
-                break;
-        }
-        return SQL_req;
-    }
-
 
     public ArrayList<String> sep = new ArrayList<>();   //tableau comportant les virgules(et), étoiles(ou)
 
@@ -236,5 +170,53 @@ public class RechercheFilm {
                 "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
                 "    LIMIT 100;";
         return SQL;
+    }
+
+    public String etudeParametre(String param){
+        String SQL_req = new String();
+        switch (param){
+            case "titre" :
+                SQL_req = TITRE_SQL;
+                break;
+            case "de" :
+                SQL_req = DE_SQL;
+                break;
+            case "avec" :
+                SQL_req = AVEC_SQL;
+                break;
+            case "pays" :
+                SQL_req = PAYS_SQL;
+                break;
+            case "en" :
+                SQL_req = EN_SQL;
+                break;
+            case "avant" :
+                SQL_req = AVANT_SQL;
+                break;
+            case "apres" :
+                SQL_req = APRES_SQL;
+                break;
+        }
+        return SQL_req;
+    }
+
+    public void selectAll(){
+        String sql = "select id_film,titre " +
+                "from films " +
+                "WHERE titre LIKE ? ";
+
+        String test = "agora";
+        try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
+            pstmt.setString(1,test);
+
+            ResultSet rs  = pstmt.executeQuery();
+
+            while (rs.next()){
+                System.out.println(rs.getInt("id_film") +  "\t" +
+                        rs.getString("titre") + "\t");
+            }
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
