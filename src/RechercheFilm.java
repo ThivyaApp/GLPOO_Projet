@@ -220,23 +220,40 @@ public class RechercheFilm {
         "WHERE (nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL));\n";
 
 
+        String a ="" , b ="" ;
         String test = demandeUtilisateur();
         String rien = "";
         String tmp = "";
         int i, j = 0;
         ResultSet rs = null;
+        ArrayList <String> ligne = new ArrayList<>();
+        String youhou = "sanjay leela bhansali";
+        ligne.addAll(Arrays.asList(youhou.split(" ")));
 
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-            for (i = 0 ; i < 2 ; i ++){
+            /*for (i = 0 ; i < 2 ; i ++){
                 if(i == 0)pstmt.setString(i+1,test);
                 else pstmt.setString(i+1, rien);
+            }*/
+
+            for(i=0;i<ligne.size();i++){
+                for(j=0;j<ligne.size();j++){
+                    if(j<=i) a = (a + " "+ ligne.get(j)).trim();
+                    if(j>i) b = (b + " "+ ligne.get(j)).trim();
+                }
+                System.out.println("a = "+ a + "\t\t\t\t\tb = " + b);
+                a = ""; b = "";
             }
+            //ligne.add(0,"hey");
+            //System.out.println(ligne);
 
 
             rs  = pstmt.executeQuery();
 
             //if(!rs.absolute(1)) System.out.println("vide");
             System.out.println(rs.getString("id_film"));
+            //System.out.println(rs.absolute(1));
+
 
             while (rs.next()){
                 System.out.println(rs.getInt("id_film") + "\t" +
