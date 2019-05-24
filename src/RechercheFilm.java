@@ -211,22 +211,40 @@ public class RechercheFilm {
     }
 
     public void selectAll(){
-        String sql = "select id_film,titre " +
-                "from films " +
-                "WHERE titre LIKE ? ";
+        String sql = "SELECT g.id_film,\n" +
+                "p.prenom,\n"+
+                "p.nom\n"+
+        "FROM personnes p\n"+
+                "JOIN\n"+
+        "generique g ON g.id_personne = p.id_personne\n"+
+        "WHERE (nom_sans_accent LIKE ? || '%' AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL));\n";
 
-        String test = "agora";
+
+        String test = demandeUtilisateur();
+        String rien = "";
+        int i, j = 0;
+        ResultSet rs = null;
+
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-            pstmt.setString(1,test);
+            for (i = 0 ; i < 2 ; i ++){
+                if(i == 0)pstmt.setString(i+1,test);
+                else pstmt.setString(i+1, rien);
+            }
 
-            ResultSet rs  = pstmt.executeQuery();
+
+            rs  = pstmt.executeQuery();
+
+            //if(!rs.absolute(1)) System.out.println("vide");
 
             while (rs.next()){
-                System.out.println(rs.getInt("id_film") +  "\t" +
-                        rs.getString("titre") + "\t");
+                System.out.println(rs.getInt("id_film") + "\t" +
+                        rs.getString("nom") +  "\t" +
+                        rs.getString("prenom") + "\t");
             }
+            //System.out.println(rs.isBeforeFirst());
         }catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+           // System.out.println(sql);
     }
 }
