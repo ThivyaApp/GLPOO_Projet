@@ -236,7 +236,7 @@ public class RechercheFilm {
             rs  = pstmt.executeQuery();
 
             //if(!rs.absolute(1)) System.out.println("vide");
-            System.out.println(rs.absolute(1));
+            System.out.println(rs.getString("id_film"));
 
             while (rs.next()){
                 System.out.println(rs.getInt("id_film") + "\t" +
