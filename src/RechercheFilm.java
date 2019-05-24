@@ -217,11 +217,12 @@ public class RechercheFilm {
         "FROM personnes p\n"+
                 "JOIN\n"+
         "generique g ON g.id_personne = p.id_personne\n"+
-        "WHERE (nom_sans_accent LIKE ? || '%' AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL));\n";
+        "WHERE (nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL));\n";
 
 
         String test = demandeUtilisateur();
         String rien = "";
+        String tmp = "";
         int i, j = 0;
         ResultSet rs = null;
 
@@ -235,6 +236,7 @@ public class RechercheFilm {
             rs  = pstmt.executeQuery();
 
             //if(!rs.absolute(1)) System.out.println("vide");
+            System.out.println(rs.absolute(1));
 
             while (rs.next()){
                 System.out.println(rs.getInt("id_film") + "\t" +
