@@ -210,51 +210,41 @@ public class RechercheFilm {
         return SQL_req;
     }
 
-
     public void selectAll(){
+        String sql = "SELECT g.id_film,\n" +
+                "p.prenom,\n"+
+                "p.nom\n"+
+        "FROM personnes p\n"+
+                "JOIN\n"+
+        "generique g ON g.id_personne = p.id_personne\n"+
+        "WHERE (nom_sans_accent LIKE ? || '%' AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL));\n";
 
-        String sql = "select id_film,titre " +
-                "from films " +
-                "WHERE titre LIKE ? ";
 
-        String test = "agora";
+        String test = demandeUtilisateur();
+        String rien = "";
+        int i, j = 0;
+        ResultSet rs = null;
+
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-
-            int p = 1;
-            int sum = 0;
-            String param1 ="", param2 = "";
-
-
-            for(int t = 0 ; t < tab_final.size(); t++){
-                if((tab_final.get(t).get(0).equals("de"))||(tab_final.get(t).get(0).equals("avec"))) {
-                    for (int h = 1; h < tab_final.get(t).size(); h++) {
-                        param1 = tab_final.get(t).get(p);
-                        p = (p + 1) % tab_final.get(t).size();
-                        if(p==0) p++;
-
-                        for (int v = 0; v < tab_final.get(t).size()-2; v++) {
-                            sum = (p + v)%tab_final.get(t).size();
-                            //System.out.println("p+v= " + p+v + "=" + sum);
-                            if(sum==0) sum++;
-                            param2+= " " + tab_final.get(t).get((sum));
-                            param2=param2.trim();
-                        }
-                        System.out.println("param1 = " + param1 + " param2 = " + param2);
-                        param2 = "";
-                    }
-                }
+            for (i = 0 ; i < 2 ; i ++){
+                if(i == 0)pstmt.setString(i+1,test);
+                else pstmt.setString(i+1, rien);
             }
 
-            pstmt.setString(1,test);
 
-            ResultSet rs  = pstmt.executeQuery();
+            rs  = pstmt.executeQuery();
+
+            //if(!rs.absolute(1)) System.out.println("vide");
 
             while (rs.next()){
-                System.out.println(rs.getInt("id_film") +  "\t" +
-                        rs.getString("titre") + "\t");
+                System.out.println(rs.getInt("id_film") + "\t" +
+                        rs.getString("nom") +  "\t" +
+                        rs.getString("prenom") + "\t");
             }
+            //System.out.println(rs.isBeforeFirst());
         }catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+           // System.out.println(sql);
     }
 }
