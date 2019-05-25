@@ -225,36 +225,47 @@ public class RechercheFilm {
                 //"    OR (nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? || '%' OR prenom_sans_accent IS NULL));";
 
 
-        String a ="" , b ="" ;
-        //String test = demandeUtilisateur();
-        String rien = "";
-        String tmp = "";
-        int i, j = 0;
+        String a ="" , b ="", param1="", param2="";
+        int i, j;
         ResultSet rs = null;
         String youhou = "sanjay leela bhansali";
         ArrayList<String> ligne = new ArrayList<>(Arrays.asList(youhou.split(" ")));
 
+
         try(PreparedStatement pstmt  = conn.prepareStatement(sql)) {
 
-            do {
-                for (i = 0; i < ligne.size(); i++) {
-                    for (j = 0; j < ligne.size(); j++) {
-                        if (j <= i) a = (a + " " + ligne.get(j)).trim();
-                        if (j > i) b = (b + " " + ligne.get(j)).trim();
+            for(int tab=0; tab<tab_final.size();tab++){
+                if(tab_final.get(tab).get(0).equals("titre")||
+                        (tab_final.get(tab).get(0).equals("pays"))||
+                        (tab_final.get(tab).get(0).equals("en"))||
+                        (tab_final.get(tab).get(0).equals("avant"))||
+                        (tab_final.get(tab).get(0).equals("apres"))||
+                        (tab_final.get(tab).get(0).equals("après"))){
+
+                    for(int sous_tab=0;sous_tab<tab_final.get(tab).size();sous_tab++){
+                        param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
                     }
-                    pstmt.setString(1, b);
-                    pstmt.setString(2, a);
-                    System.out.println("a = " + a + "\t\t\t\t\tb = " + b);
-                    rs = pstmt.executeQuery();
-                    a = "";
-                    b = "";
+                    pstmt.setString(1, param1);
+                    param1 = "";
+                }else{
+                    do {
+                        for (i = 0; i < ligne.size(); i++) {
+                            for (j = 0; j < ligne.size(); j++) {
+                                if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
+                                if (j > i) param2 = (param2 + " " + ligne.get(j)).trim();
+                            }
+                            pstmt.setString(1, param2);
+                            pstmt.setString(2, param1);
+                            System.out.println("a = " + param1 + "\t\t\t\t\tb = " + param2);
+                            rs = pstmt.executeQuery();
+                            param1 = "";
+                            param2 = "";
+                        }
+                        //} while (!rs.next());
+
+                    }while (!rs.wasNull());
                 }
-            //} while (!rs.next());
-
-            }while (!rs.wasNull());
-
-
-            System.out.println(rs.getString("id_film"));
+            }
             //System.out.println(rs.absolute(1));
 
             while (rs.next()){
