@@ -9,24 +9,25 @@ public class RechercheFilm {
     Connection conn = null;
 
     //Recherche acteur
-    public String AVEC_SQL = "\tselect g.id_film\n" +
-            "\tfrom personnes p\n" +
-            "\t\tjoin generique g \n" +
-            "\t\ton g.id_personne = p.id_personne\n" +
-            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tAND role = 'A'";
-
+    String AVEC_SQL = "SELECT g.id_film\n" +
+            "\tFROM personnes p\n" +
+            "\tJOIN generique g \n" +
+            "\tON g.id_personne = p.id_personne\n" +
+            "\tWHERE nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL)\n" +
+            "\tOR nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL)\n" +
+            //"\tOR nom_sans_accent LIKE ?\n" +
+            //"\tOR prenom_sans_accent LIKE ? || '%'\n" +
+            "\tAND role = 'A'";
     //Recherche réalisateur
-    public String DE_SQL = "\tselect g.id_film\n" +
-            "\tfrom personnes p\n" +
-            "\t\tjoin generique g \n" +
-            "\t\ton g.id_personne = p.id_personne\n" +
-            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
-            "\t\t\tAND role = 'R'";
+    String DE_SQL = "SELECT g.id_film\n" +
+            "        FROM personnes p\n" +
+            "        JOIN generique g \n" +
+            "        ON g.id_personne = p.id_personne\n" +
+            "        WHERE nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL)\n" +
+            "        OR nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? ||'%' OR prenom_sans_accent IS NULL)\n" +
+            //"        OR nom_sans_accent LIKE ?\n" +
+            //"        OR prenom_sans_accent LIKE ? || '%'\n" +
+            "        AND role = 'R'";
 
     //Recherche titre
     public String TITRE_SQL = "\tselect id_film\n"+
@@ -88,6 +89,7 @@ public class RechercheFilm {
             //System.out.println(tab_final.get(i));
         }
         recupSeparateur(TypedLine);
+        Retrouve(constructionSQL());
     }
 
     /**
@@ -124,47 +126,49 @@ public class RechercheFilm {
         String vert = "\u001B[32m";
         String blanc = "\u001B[0m";
 
-        for (int i = 0; i<sep.size();i++){
-            cond1 = tab_final.get(j).get(0);
-            cond2 = tab_final.get(j+1).get(0);
+        if(sep.size() == 0){
+            SQL += etudeParametre(tab_final.get(0).get(0));
+        } else {
+            for (int i = 0; i < sep.size(); i++) {
+                cond1 = tab_final.get(j).get(0);
+                cond2 = tab_final.get(j + 1).get(0);
 
-            if(!cond2.equals("avec") && !cond2.equals("avant") && !cond2.equals("de") && !cond2.equals("pays")
-                    && !cond2.equals("titre") && !cond2.equals("en") && !cond2.equals("apres") )  cond2 = tab_final.get(j).get(0);
+                if (!cond2.equals("avec") && !cond2.equals("avant") && !cond2.equals("de") && !cond2.equals("pays")
+                        && !cond2.equals("titre") && !cond2.equals("en") && !cond2.equals("apres"))
+                    cond2 = tab_final.get(j).get(0);
 
-            if(!cond1.equals("avec") && !cond1.equals("avant") && !cond1.equals("de") && !cond1.equals("pays")
-                    && !cond1.equals("titre") && !cond1.equals("en") && !cond1.equals("apres") && j > 0 )  cond1 = tab_final.get(j-1).get(0);
+                if (!cond1.equals("avec") && !cond1.equals("avant") && !cond1.equals("de") && !cond1.equals("pays")
+                        && !cond1.equals("titre") && !cond1.equals("en") && !cond1.equals("apres") && j > 0)
+                    cond1 = tab_final.get(j - 1).get(0);
 
-            // debug
+                // debug
 
-            //System.out.println(bleu + cond1);
-            //System.out.println(jaune + cond2 + blanc);
+                //System.out.println(bleu + cond1);
+                //System.out.println(jaune + cond2 + blanc);
 
-            if(sep.get(i).equals(",")){
-                if((i == 0 && sep.size() > 1) || (i < sep.size()-1 )){ // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
-                    et = vert + etudeParametre(cond1);
-                    if(i != sep.size()-1) et  += "\nINTERSECT\n" + blanc; // si il est vraiment au milieu on rajoute INTERSECT
-                }else if(sep.size() == 1 || ((i == sep.size()-1) && sep.get(i).equals(sep.get(i - 1)))){ // sinon si il est le seul ou le dernier sachant que le separateur precedent etait ","
-                    et = bleu + etudeParametre(cond1)+ "\nINTERSECT\n" + etudeParametre(cond2) + blanc;
-                } else { // sinon si il est le dernier
-                    if(!sep.get(i).equals(sep.get(i - 1))) et = jaune + "\nINTERSECT\n" + etudeParametre(cond2) + blanc; // si avant c'était pas une ","
-                    else et = jaune + etudeParametre(cond1) + blanc;
-                }
-                SQL += et;
-            } else if(sep.get(i).equals("*")){
-                if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){ // si c'est le premier ou que le precedent était ","
-                    ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc ;
+                if (sep.get(i).equals(",")) {
+                    if ((i == 0 && sep.size() > 1) || (i < sep.size() - 1)) { // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
+                        et = vert + etudeParametre(cond1);
+                        if (i != sep.size() - 1)
+                            et += "\nINTERSECT\n" + blanc; // si il est vraiment au milieu on rajoute INTERSECT
+                    } else if (sep.size() == 1 || ((i == sep.size() - 1) && sep.get(i).equals(sep.get(i - 1)))) { // sinon si il est le seul ou le dernier sachant que le separateur precedent etait ","
+                        et = bleu + etudeParametre(cond1) + "\nINTERSECT\n" + etudeParametre(cond2) + blanc;
+                    } else { // sinon si il est le dernier
+                        if (!sep.get(i).equals(sep.get(i - 1)))
+                            et = jaune + "\nINTERSECT\n" + etudeParametre(cond2) + blanc; // si avant c'était pas une ","
+                        else et = jaune + etudeParametre(cond1) + blanc;
+                    }
+                    SQL += et;
                 } else {
-                    ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
+                    if (i == 0 || !sep.get(i).equals(sep.get(i - 1))) { // si c'est le premier ou que le precedent était ","
+                        ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc;
+                    } else {
+                        ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
+                    }
+                    SQL += ou;
                 }
-                SQL += ou;
-            } else {
-                if(tab_final.get(0).get(0).equals("AVEC")){
-                    System.out.println(bleu + "");
-                    SQL += etudeParametre("AVEC");
-                }
+                if (j < tab_final.size()) j++;
             }
-
-            if(j < tab_final.size())j++;
         }
 
         SQL+= blanc + ")\n" +
@@ -184,12 +188,8 @@ public class RechercheFilm {
                 "    on p.id_personne = g.id_personne\n" +
                 "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
                 "    LIMIT 100;";
-
-        System.out.println("tab : " + tab_final);
-        System.out.println("sql : " + SQL);
         return SQL;
     }
-
     public String etudeParametre(String param){
         String SQL_req = new String();
         switch (param){
@@ -218,20 +218,62 @@ public class RechercheFilm {
         return SQL_req;
     }
 
-    public void selectAll(){
-        String sql = "select id_film,titre " +
-                "from films " +
-                "WHERE titre LIKE ? ";
+    public void Retrouve(String requete){
+        //requete = constructionSQL();
 
-        String test = "agora";
-        try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
-            pstmt.setString(1,test);
+        String a ="" , b ="", param1="", param2="";
+        int i=0, j;
+        ResultSet rs = null;
+        String youhou = "cedric the entertainer";
+        ArrayList<String> ligne = new ArrayList<>(Arrays.asList(youhou.split(" ")));
+        System.out.println(requete);
 
-            ResultSet rs  = pstmt.executeQuery();
+
+        try(PreparedStatement pstmt  = conn.prepareStatement(requete)) {
+
+            for(int tab=0; tab<tab_final.size();tab++){
+                if(tab_final.get(tab).get(0).equals("titre")||
+                        (tab_final.get(tab).get(0).equals("pays"))||
+                        (tab_final.get(tab).get(0).equals("en"))||
+                        (tab_final.get(tab).get(0).equals("avant"))||
+                        (tab_final.get(tab).get(0).equals("apres"))||
+                        (tab_final.get(tab).get(0).equals("après"))){
+
+                    for(int sous_tab=0;sous_tab<tab_final.get(tab).size();sous_tab++){
+                        param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
+                    }
+                    pstmt.setString(1, param1);
+                    param1 = "";
+                }else{
+                    do{
+                        for (j = 0; j < ligne.size(); j++) {
+                            if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
+                            if (j > i) param2 = (param2 + " " + ligne.get(j)).trim();
+                        }
+                        pstmt.setString(1, param1);
+                        pstmt.setString(2, param2);
+                        pstmt.setString(3, param2);
+                        pstmt.setString(4, param1);
+
+                        System.out.println("a = " + param1 + "\t\t\t\t\tb = " + param2);
+                        System.out.println("c = " + param2 + "\t\t\t\t\td = " + param1 + "\n");
+                        rs = pstmt.executeQuery();
+                        param1 = "";
+                        param2 = "";
+                        if (i<ligne.size()) i++;
+                        //System.out.println("i= "+ i);
+                        //System.out.println("size = " + ligne.size());
+                    } while (!rs.next() && i < ligne.size());
+                    rs = pstmt.executeQuery();
+
+                }
+            }
+            //System.out.println(rs.absolute(1));
 
             while (rs.next()){
-                System.out.println(rs.getInt("id_film") +  "\t" +
-                        rs.getString("titre") + "\t");
+                System.out.println(rs.getInt("id_film") + "\t" +
+                        rs.getString("nom") +  "\t" +
+                        rs.getString("prenom") + "\t");
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
