@@ -6,9 +6,9 @@ public class Main {
         RechercheFilm rechercheFilm = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\Projet_GLPOO\\bdfilm.sqlite\\bdfilm.sqlite");
 
         rechercheFilm.lectureLigneUtilisateur();
-        rechercheFilm.actualiser_tab();
-        rechercheFilm.selectAll();
-        //System.out.println(rechercheFilm.constructionSQL());
+        //rechercheFilm.actualiser_tab();
+        //rechercheFilm.selectAll();
+        System.out.println(rechercheFilm.constructionSQL());
 
 
     }

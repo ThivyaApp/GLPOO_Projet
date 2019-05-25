@@ -5,8 +5,56 @@ import java.util.Scanner;
 
 public class RechercheFilm {
 
-    private ArrayList<ArrayList<String>> tab_final = new ArrayList<>();    //contient tableau final (tableau de temp_tab)
-    private Connection conn = null;
+    public ArrayList<ArrayList<String>> tab_final = new ArrayList<>();    //contient tableau final (tableau de temp_tab)
+    Connection conn = null;
+
+    //Recherche acteur
+    public String AVEC_SQL = "\tselect g.id_film\n" +
+            "\tfrom personnes p\n" +
+            "\t\tjoin generique g \n" +
+            "\t\ton g.id_personne = p.id_personne\n" +
+            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tAND role = 'A'";
+
+    //Recherche réalisateur
+    public String DE_SQL = "\tselect g.id_film\n" +
+            "\tfrom personnes p\n" +
+            "\t\tjoin generique g \n" +
+            "\t\ton g.id_personne = p.id_personne\n" +
+            "\t\t\tWHERE (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tOR (nom_sans_accent LIKE ? AND prenom_sans_accent LIKE ? || '%')\n" +
+            "\t\t\tAND role = 'R'";
+
+    //Recherche titre
+    public String TITRE_SQL = "\tselect id_film\n"+
+                            "\tfrom recherche_titre\n"+
+                            "\twhere titre match ?";
+
+    //Recherche pays
+    public String PAYS_SQL = "\tselect f.id_film\n"+
+                            "\tfrom films f\n"+
+                            "\t\tjoin pays p\n"+
+                            "\t\ton f.pays = p.code\n"+
+                            "\t\tWHERE f.pays LIKE ?\n"+
+                            "\t\tOR p.nom LIKE ?";
+
+    //Recherche année
+    public String EN_SQL =  "\tselect id_film\n"+
+                            "\tfrom films\n"+
+                            "\tWHERE annee LIKE ?";
+
+    //Recherche année AVANT
+    public String AVANT_SQL = "\tselect id_film" +
+            "\tfrom films\n" +
+            "\tWHERE annee < ?";
+
+    //Recherche année APRES
+    public String APRES_SQL = "\tselect id_film" +
+            "\tfrom films\n" +
+            "\tWHERE annee > ? ";
 
     /**
      * @return Retourne la ligne saisie par l'utilisateur après lui avoir demandé
@@ -24,39 +72,24 @@ public class RechercheFilm {
     public void lectureLigneUtilisateur() {
 
         String TypedLine = demandeUtilisateur();
+        ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
         ArrayList<String> temp_tab_nonnull = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
         String[] temp_tab_null;   //contient split en fonction d'un espace des lignes de typedLineArray avec valeur null
-        //Séparation par virgule, ajout dans tableau
-        ArrayList<String> typedLineArray = new ArrayList<String>(Arrays.asList(TypedLine.trim().split(",|\\*")));
+        typedLineArray.addAll(Arrays.asList(TypedLine.trim().split(",|\\*")));     //Séparation par virgule, ajout dans tableau
 
-        for (String aTypedLineArray : typedLineArray) {
-            temp_tab_null = aTypedLineArray.trim().split(" ");
-            for (String aTemp_tab_null : temp_tab_null) {
-                if (!aTemp_tab_null.equals(" ")) temp_tab_nonnull.add(aTemp_tab_null);
+        for (int i = 0; i < typedLineArray.size(); i++) {
+            temp_tab_null = typedLineArray.get(i).trim().split(" ");
+            for(int w=0; w<temp_tab_null.length;w++){
+                if(temp_tab_null[w].equals("")){}
+                else temp_tab_nonnull.add(temp_tab_null[w]);
             }
             tab_final.add(temp_tab_nonnull);
             temp_tab_nonnull = new ArrayList<>();
+            //System.out.println(tab_final.get(i));
         }
         recupSeparateur(TypedLine);
     }
 
-    public void actualiser_tab(){
-        String var = "";
-        for(int i = 0; i<tab_final.size();i++){
-            if(tab_final.get(i).get(0).equals("titre")||
-                    (tab_final.get(i).get(0).equals("pays"))||
-                    (tab_final.get(i).get(0).equals("en"))||
-                    (tab_final.get(i).get(0).equals("avant"))||
-                    (tab_final.get(i).get(0).equals("apres"))||
-                    (tab_final.get(i).get(0).equals("après"))||
-                    (tab_final.get(i).get(0).equals("de"))||
-                    (tab_final.get(i).get(0).equals("avec"))){
-                var = tab_final.get(i).get(0);
-            }else{
-                tab_final.get(i).add(0,var);
-            }
-        }
-    }
     /**
      * @param nomFichierSQLite emplacement de la base de données dans l'ordinateur (chemin)
      */
@@ -68,6 +101,7 @@ public class RechercheFilm {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+
     }
 
     public ArrayList<String> sep = new ArrayList<>();   //tableau comportant les virgules(et), étoiles(ou)
@@ -116,13 +150,18 @@ public class RechercheFilm {
                     else et = jaune + etudeParametre(cond1) + blanc;
                 }
                 SQL += et;
-            } else {
+            } else if(sep.get(i).equals("*")){
                 if (i == 0 || !sep.get(i).equals(sep.get(i - 1))){ // si c'est le premier ou que le precedent était ","
                     ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc ;
                 } else {
                     ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
                 }
                 SQL += ou;
+            } else {
+                if(tab_final.get(0).get(0).equals("AVEC")){
+                    System.out.println(bleu + "");
+                    SQL += etudeParametre("AVEC");
+                }
             }
 
             if(j < tab_final.size())j++;
@@ -145,51 +184,14 @@ public class RechercheFilm {
                 "    on p.id_personne = g.id_personne\n" +
                 "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
                 "    LIMIT 100;";
+
+        System.out.println("tab : " + tab_final);
+        System.out.println("sql : " + SQL);
         return SQL;
     }
 
     public String etudeParametre(String param){
         String SQL_req = new String();
-        //Recherche titre
-        String TITRE_SQL = "\tselect id_film\n" +
-                "\tfrom recherche_titre\n" +
-                "\twhere titre match ?";
-        //Recherche acteur
-        String AVEC_SQL = "select g.id_film\n" +
-                "from personnes p\n" +
-                "    join generique g\n" +
-                "    on g.id_personne = p.id_personne\n" +
-                "    WHERE (nom_sans_accent LIKE 'kajol' AND (prenom_sans_accent LIKE '' || '%' OR prenom_sans_accent IS NULL))\n" +
-                "    OR (nom_sans_accent LIKE '' AND (prenom_sans_accent LIKE 'kajol'|| '%' OR prenom_sans_accent IS NULL))\n" +
-                "    AND role = 'A'";
-        //Recherche réalisateur
-        String DE_SQL = "select g.id_film\n" +
-                "from personnes p\n" +
-                "    join generique g\n" +
-                "    on g.id_personne = p.id_personne\n" +
-                "    WHERE (nom_sans_accent LIKE 'kajol' AND (prenom_sans_accent LIKE '' || '%' OR prenom_sans_accent IS NULL))\n" +
-                "    OR (nom_sans_accent LIKE '' AND (prenom_sans_accent LIKE 'kajol'|| '%' OR prenom_sans_accent IS NULL))\n" +
-                "    AND role = 'R'";
-        //Recherche pays
-        String PAYS_SQL = "\tselect f.id_film\n" +
-                "\tfrom films f\n" +
-                "\t\tjoin pays p\n" +
-                "\t\ton f.pays = p.code\n" +
-                "\t\tWHERE f.pays LIKE ?\n" +
-                "\t\tOR p.nom LIKE ?";
-        //Recherche année
-        String EN_SQL = "\tselect id_film\n" +
-                "\tfrom films\n" +
-                "\tWHERE annee LIKE ?";
-        //Recherche année AVANT
-        String AVANT_SQL = "\tselect id_film" +
-                "\tfrom films\n" +
-                "\tWHERE annee < ?";
-        //Recherche année APRES
-        String APRES_SQL = "\tselect id_film" +
-                "\tfrom films\n" +
-                "\tWHERE annee > ? ";
-
         switch (param){
             case "titre" :
                 SQL_req = TITRE_SQL;
@@ -217,61 +219,19 @@ public class RechercheFilm {
     }
 
     public void selectAll(){
-        String sql = "select g.id_film, p.prenom, p.nom\n" +
-                "from personnes p\n" +
-                "    join generique g\n" +
-                "    on g.id_personne = p.id_personne\n" +
-                "    WHERE (nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? || '%' OR prenom_sans_accent IS NULL))\n";
-                //"    OR (nom_sans_accent LIKE ? AND (prenom_sans_accent LIKE ? || '%' OR prenom_sans_accent IS NULL));";
+        String sql = "select id_film,titre " +
+                "from films " +
+                "WHERE titre LIKE ? ";
 
+        String test = "agora";
+        try(PreparedStatement pstmt  = conn.prepareStatement(sql)){
+            pstmt.setString(1,test);
 
-        String a ="" , b ="", param1="", param2="";
-        int i, j;
-        ResultSet rs = null;
-        String youhou = "sanjay leela bhansali";
-        ArrayList<String> ligne = new ArrayList<>(Arrays.asList(youhou.split(" ")));
-
-
-        try(PreparedStatement pstmt  = conn.prepareStatement(sql)) {
-
-            for(int tab=0; tab<tab_final.size();tab++){
-                if(tab_final.get(tab).get(0).equals("titre")||
-                        (tab_final.get(tab).get(0).equals("pays"))||
-                        (tab_final.get(tab).get(0).equals("en"))||
-                        (tab_final.get(tab).get(0).equals("avant"))||
-                        (tab_final.get(tab).get(0).equals("apres"))||
-                        (tab_final.get(tab).get(0).equals("après"))){
-
-                    for(int sous_tab=0;sous_tab<tab_final.get(tab).size();sous_tab++){
-                        param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
-                    }
-                    pstmt.setString(1, param1);
-                    param1 = "";
-                }else{
-                    do {
-                        for (i = 0; i < ligne.size(); i++) {
-                            for (j = 0; j < ligne.size(); j++) {
-                                if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
-                                if (j > i) param2 = (param2 + " " + ligne.get(j)).trim();
-                            }
-                            pstmt.setString(1, param2);
-                            pstmt.setString(2, param1);
-                            System.out.println("a = " + param1 + "\t\t\t\t\tb = " + param2);
-                            rs = pstmt.executeQuery();
-                            param1 = "";
-                            param2 = "";
-                        }
-                        //} while (!rs.next());
-
-                    }while (!rs.wasNull());
-                }
-            }
-            //System.out.println(rs.absolute(1));
+            ResultSet rs  = pstmt.executeQuery();
 
             while (rs.next()){
-                System.out.println(rs.getInt("id_film") + "\t" +
-                        rs.getString("nom") +  "\t" +
-                        rs.getString("prenom") + "\t");
+                System.out.println(rs.getInt("id_film") +  "\t" +
+                        rs.getString("titre") + "\t");
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
