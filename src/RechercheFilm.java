@@ -7,6 +7,7 @@ public class RechercheFilm {
 
     public ArrayList<ArrayList<String>> tab_final = new ArrayList<>();    //contient tableau final (tableau de temp_tab)
     Connection conn = null;
+    String user_line;
 
     //Recherche acteur
     String AVEC_SQL = "SELECT g.id_film\n" +
@@ -63,7 +64,7 @@ public class RechercheFilm {
     public String demandeUtilisateur(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Rechercher un film :");
-        String user_line = scan.nextLine().toLowerCase().replaceAll(" ou "," * ");
+        user_line = scan.nextLine().toLowerCase().replaceAll(" ou "," * ");
         return user_line;
     }
 
@@ -121,10 +122,6 @@ public class RechercheFilm {
         String SQL = "with filtre as(\n";
 
         //System.out.println("sep size = " + sep.size());
-        String bleu = "\u001B[34m";
-        String jaune = "\u001B[33m";
-        String vert = "\u001B[32m";
-        String blanc = "\u001B[0m";
 
         if(sep.size() == 0){
             SQL += etudeParametre(tab_final.get(0).get(0));
@@ -148,22 +145,22 @@ public class RechercheFilm {
 
                 if (sep.get(i).equals(",")) {
                     if ((i == 0 && sep.size() > 1) || (i < sep.size() - 1)) { // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
-                        et = vert + etudeParametre(cond1);
+                        et = etudeParametre(cond1);
                         if (i != sep.size() - 1)
-                            et += "\nINTERSECT\n" + blanc; // si il est vraiment au milieu on rajoute INTERSECT
+                            et += "\nINTERSECT\n"; // si il est vraiment au milieu on rajoute INTERSECT
                     } else if (sep.size() == 1 || ((i == sep.size() - 1) && sep.get(i).equals(sep.get(i - 1)))) { // sinon si il est le seul ou le dernier sachant que le separateur precedent etait ","
-                        et = bleu + etudeParametre(cond1) + "\nINTERSECT\n" + etudeParametre(cond2) + blanc;
+                        et = etudeParametre(cond1) + "\nINTERSECT\n" + etudeParametre(cond2);
                     } else { // sinon si il est le dernier
                         if (!sep.get(i).equals(sep.get(i - 1)))
-                            et = jaune + "\nINTERSECT\n" + etudeParametre(cond2) + blanc; // si avant c'était pas une ","
-                        else et = jaune + etudeParametre(cond1) + blanc;
+                            et ="\nINTERSECT\n" + etudeParametre(cond2); // si avant c'était pas une ","
+                        else et =etudeParametre(cond1);
                     }
                     SQL += et;
                 } else {
                     if (i == 0 || !sep.get(i).equals(sep.get(i - 1))) { // si c'est le premier ou que le precedent était ","
-                        ou = bleu + etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2) + blanc;
+                        ou = etudeParametre(cond1) + "\nUNION\n" + etudeParametre(cond2);
                     } else {
-                        ou = jaune + "\nUNION\n" + etudeParametre(cond2) + blanc;
+                        ou = "\nUNION\n" + etudeParametre(cond2);
                     }
                     SQL += ou;
                 }
@@ -171,23 +168,24 @@ public class RechercheFilm {
             }
         }
 
-        SQL+= blanc + ")\n" +
+        SQL+=   ")\n" +
                 "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
-                "group_concat(a.titre, ' | ') as autres_titres,\n" +
+                "group_concat(a.titre) as autres_titres,\n" +
                 "p.prenom, p.nom, g.role\n" +
                 "from filtre\n" +
-                "    join films f\n" +
-                "    on f.id_film = filtre.id_film\n" +
-                "    join pays py\n" +
-                "    on py.code = f.pays\n" +
-                "    left join autres_titres a\n" +
-                "    on a.id_film = f.id_film\n" +
-                "    join generique g\n" +
-                "    on g.id_film = f.id_film\n" +
-                "    join personnes p\n" +
-                "    on p.id_personne = g.id_personne\n" +
-                "    group by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
-                "    LIMIT 100;";
+                "\tjoin films f\n" +
+                "\ton f.id_film = filtre.id_film\n" +
+                "\tjoin pays py\n" +
+                "\ton py.code = f.pays\n" +
+                "\tleft join autres_titres a\n" +
+                "\ton a.id_film = f.id_film\n" +
+                "\tjoin generique g\n" +
+                "\ton g.id_film = f.id_film\n" +
+                "\tjoin personnes p\n" +
+                "\ton p.id_personne = g.id_personne\n" +
+                "\tgroup by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
+                "\tLIMIT 100;";
+
         return SQL;
     }
     public String etudeParametre(String param){
@@ -219,18 +217,21 @@ public class RechercheFilm {
     }
 
     public void Retrouve(String requete){
-        //requete = constructionSQL();
+
+        //System.out.println(requete);
+        //String sql = new String();
+        //sql += requete;
 
         String a ="" , b ="", param1="", param2="";
         int i=0, j;
         ResultSet rs = null;
-        String youhou = "cedric the entertainer";
+        String youhou = user_line;
         ArrayList<String> ligne = new ArrayList<>(Arrays.asList(youhou.split(" ")));
-        System.out.println(requete);
+        //System.out.println(sql);
 
+        System.out.println(tab_final.size());
 
         try(PreparedStatement pstmt  = conn.prepareStatement(requete)) {
-
             for(int tab=0; tab<tab_final.size();tab++){
                 if(tab_final.get(tab).get(0).equals("titre")||
                         (tab_final.get(tab).get(0).equals("pays"))||
@@ -239,12 +240,15 @@ public class RechercheFilm {
                         (tab_final.get(tab).get(0).equals("apres"))||
                         (tab_final.get(tab).get(0).equals("après"))){
 
-                    for(int sous_tab=0;sous_tab<tab_final.get(tab).size();sous_tab++){
+                    for(int sous_tab=1;sous_tab<tab_final.get(tab).size();sous_tab++){
                         param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
                     }
+                    System.out.println(param1);
                     pstmt.setString(1, param1);
                     param1 = "";
+                    System.out.println("ici");
                 }else{
+                    System.out.println("je passe");
                     do{
                         for (j = 0; j < ligne.size(); j++) {
                             if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
@@ -264,15 +268,16 @@ public class RechercheFilm {
                         //System.out.println("i= "+ i);
                         //System.out.println("size = " + ligne.size());
                     } while (!rs.next() && i < ligne.size());
-                    rs = pstmt.executeQuery();
 
                 }
+                rs = pstmt.executeQuery();
             }
             //System.out.println(rs.absolute(1));
 
             while (rs.next()){
                 System.out.println(rs.getInt("id_film") + "\t" +
                         rs.getString("nom") +  "\t" +
+                        rs.getString("titre") +  "\t" +
                         rs.getString("prenom") + "\t");
             }
         }catch (SQLException e) {
