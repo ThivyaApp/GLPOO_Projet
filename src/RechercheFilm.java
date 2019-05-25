@@ -215,6 +215,25 @@ public class RechercheFilm {
         }
         return SQL_req;
     }
+    public void actualiser_tab(){
+        String var = "";
+        for(int i = 0; i<tab_final.size();i++){
+            if(tab_final.get(i).get(0).equals("titre")||
+                    (tab_final.get(i).get(0).equals("pays"))||
+                    (tab_final.get(i).get(0).equals("en"))||
+                    (tab_final.get(i).get(0).equals("avant"))||
+                    (tab_final.get(i).get(0).equals("apres"))||
+                    (tab_final.get(i).get(0).equals("après"))||
+                    (tab_final.get(i).get(0).equals("de"))||
+                    (tab_final.get(i).get(0).equals("avec"))){
+                var = tab_final.get(i).get(0);
+            }else{
+                tab_final.get(i).add(0,var);
+            }
+        }
+    }
+
+
 
     public void Retrouve(String requete){
 
@@ -223,30 +242,50 @@ public class RechercheFilm {
         //sql += requete;
 
         String a ="" , b ="", param1="", param2="";
-        int i=0, j;
+        int i=0, j, k = 1;
         ResultSet rs = null;
-        String youhou = user_line;
-        ArrayList<String> ligne = new ArrayList<>(Arrays.asList(youhou.split(" ")));
+        //String youhou = user_line;
+        actualiser_tab();
+        ArrayList<String> ligne = new ArrayList<>();
+            for(int aa = 1 ; aa < tab_final.get(0).size() ; aa++){
+                ligne.add(tab_final.get(0).get(aa));
+            }
         //System.out.println(sql);
 
         System.out.println(tab_final.size());
+        System.out.println(tab_final);
 
         try(PreparedStatement pstmt  = conn.prepareStatement(requete)) {
             for(int tab=0; tab<tab_final.size();tab++){
+                System.out.println("tab" + tab);
                 if(tab_final.get(tab).get(0).equals("titre")||
                         (tab_final.get(tab).get(0).equals("pays"))||
                         (tab_final.get(tab).get(0).equals("en"))||
                         (tab_final.get(tab).get(0).equals("avant"))||
                         (tab_final.get(tab).get(0).equals("apres"))||
                         (tab_final.get(tab).get(0).equals("après"))){
+                    System.out.println("ici");
 
                     for(int sous_tab=1;sous_tab<tab_final.get(tab).size();sous_tab++){
                         param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
                     }
-                    System.out.println(param1);
-                    pstmt.setString(1, param1);
+                    System.out.println("parametre 1 :"+param1);
+                    pstmt.setString(k, param1);
+
+
                     param1 = "";
-                    System.out.println("ici");
+                    k++;
+
+                    if(tab < tab_final.size() -1) {
+                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                            pstmt.setString(k, "");
+                            pstmt.setString(k + 1, "");
+                            pstmt.setString(k + 2, "");
+                            pstmt.setString(k + 3, "");
+                        } else {
+                            pstmt.setString(k, "");
+                        }
+                    }
                 }else{
                     System.out.println("je passe");
                     do{
@@ -254,13 +293,31 @@ public class RechercheFilm {
                             if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
                             if (j > i) param2 = (param2 + " " + ligne.get(j)).trim();
                         }
-                        pstmt.setString(1, param1);
-                        pstmt.setString(2, param2);
-                        pstmt.setString(3, param2);
-                        pstmt.setString(4, param1);
+                        pstmt.setString(k, param1);
+                        k++;
+                        pstmt.setString(k, param2);
+                        k++;
+                        pstmt.setString(k, param2);
+                        k++;
+                        pstmt.setString(k, param1);
+                        k++;
+
+                        if(tab < tab_final.size() -1) {
+                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                                pstmt.setString(k, "");
+                                pstmt.setString(k + 1, "");
+                                pstmt.setString(k + 2, "");
+                                pstmt.setString(k + 3, "");
+                            } else {
+                                pstmt.setString(k, "");
+                            }
+                        }
 
                         System.out.println("a = " + param1 + "\t\t\t\t\tb = " + param2);
                         System.out.println("c = " + param2 + "\t\t\t\t\td = " + param1 + "\n");
+                        System.out.println("k = " + k);
+                        System.out.println("param 1" + param1);
+                        System.out.println("param 2" + param2);
                         rs = pstmt.executeQuery();
                         param1 = "";
                         param2 = "";
