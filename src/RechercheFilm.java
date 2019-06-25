@@ -336,12 +336,16 @@ public class RechercheFilm {
                 }
                 rs = pstmt.executeQuery();
             }
-            //System.out.println(rs.absolute(1));
-                String titre_prec;
-               //titre_prec = rs.getString("titre");
+
+            int id_prec = rs.getInt("id_film");
+            ArrayList<NomPersonne> real = new ArrayList<>();
+            ArrayList<NomPersonne> act = new ArrayList<>();
+            ArrayList<String> autre_titres = new ArrayList<>();
+
+            //System.out.println(id);
 
             while (rs.next()){
-                /*System.out.println(rs.getInt("id_film") + "\t" +
+               /* System.out.println(rs.getInt("id_film") + "\t" +
                         rs.getString("pays") +  "\t" +
                         rs.getString("titre") +  "\t" +
                         rs.getString("prenom") + "\t" +
@@ -349,26 +353,22 @@ public class RechercheFilm {
                         rs.getString("role") + "\t" +
                         rs.getString("autres_titres") + "\t");*/
 
-
-                ArrayList<NomPersonne> real = new ArrayList<>();
                 if("R".equals(rs.getString("role"))){
                     NomPersonne nomPersonne = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
                     real.add(nomPersonne);
                 }
-
-                ArrayList<NomPersonne> act = new ArrayList<>();
                 if("A".equals(rs.getString("role"))){
                     NomPersonne nomPersonne = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
                     act.add(nomPersonne);
                 }
-
-                ArrayList<String> autre_titres = new ArrayList<>();
                 autre_titres.add(rs.getString("autres_titres"));
-                InfoFilm infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays"), rs.getInt("annee"), rs.getInt("duree"), autre_titres);
-               //real.clear(); act.clear();
-                //titre_prec = rs.getString("titre");
-                System.out.println(infoFilm.toString());
+            InfoFilm infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
+            //System.out.println("je passe");
+            System.out.println(infoFilm.toString());
+
             }
+
+
         }catch (SQLException e) {
             System.out.println(e.getMessage());
         }
