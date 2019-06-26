@@ -251,6 +251,7 @@ public class RechercheFilm {
         int i=0, j, k = 1;
         ResultSet rs = null;
         actualiser_tab();
+        System.out.println(code_SQL);
 
         //tableau contenant les mots-clés
         ArrayList<String> ligne = new ArrayList<>();
@@ -262,7 +263,7 @@ public class RechercheFilm {
         try(PreparedStatement pstmt  = conn.prepareStatement(code_SQL)) {
             for(int tab=0; tab<tab_final.size();tab++){
                 if(tab_final.get(tab).get(0).equals("titre")||
-                        (tab_final.get(tab).get(0).equals("pays"))||
+                        //(tab_final.get(tab).get(0).equals("pays"))||
                         (tab_final.get(tab).get(0).equals("en"))||
                         (tab_final.get(tab).get(0).equals("avant"))||
                         (tab_final.get(tab).get(0).equals("apres"))||
@@ -276,7 +277,7 @@ public class RechercheFilm {
                     k++;
 
                     if(tab < tab_final.size() -1) {
-                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") ||(tab_final.get(tab+1).get(0).equals("pays"))) {
                             pstmt.setString(k, "");
                             pstmt.setString(k + 1, "");
                             pstmt.setString(k + 2, "");
@@ -301,7 +302,7 @@ public class RechercheFilm {
                         k++;
 
                         if(tab < tab_final.size() -1) {
-                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") || (tab_final.get(tab+1).get(0).equals("pays"))) {
                                 pstmt.setString(k, "");
                                 pstmt.setString(k + 1, "");
                                 pstmt.setString(k + 2, "");
@@ -321,10 +322,12 @@ public class RechercheFilm {
             }
 
             int id_prec = rs.getInt("id_film");
+            int wait = 0, size = -1;
             ArrayList<NomPersonne> real = new ArrayList<>();
             ArrayList<NomPersonne> act = new ArrayList<>();
             ArrayList<String> autre_titres = new ArrayList<>();
-            InfoFilm infoFilm;
+            InfoFilm infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
+
 
             //System.out.println(id);
 
@@ -336,28 +339,32 @@ public class RechercheFilm {
                         rs.getString("nom") + "\t" +
                         rs.getString("role") + "\t" +
                         rs.getString("autres_titres") + "\t");*/
+                if(id_prec != rs.getInt("id_film")){
+                    real = new ArrayList<>();
+                    act = new ArrayList<>();
+                    autre_titres = new ArrayList<>();
+                    System.out.println(infoFilm.toString());
+                } id_prec = rs.getInt("id_film");
 
                 if("R".equals(rs.getString("role"))){
                     NomPersonne nomPersonneR = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
                     real.add(nomPersonneR);
                 }
-                if("A".equals(rs.getString("role"))){
+                else if("A".equals(rs.getString("role"))){
                     NomPersonne nomPersonneA = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
                     act.add(nomPersonneA);
                 }
 
-                autre_titres.addAll(Arrays.asList(rs.getString("autres_titres").split(",")));
+                if(rs.getString("autres_titres") != null )
+                    if(autre_titres.size() == 0){
+                        autre_titres.addAll(Arrays.asList(rs.getString("autres_titres").split(",")));
+                    }
                 infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
                 //System.out.println("je passe");
-                System.out.println(infoFilm.toString());
-                if(id_prec != rs.getInt("id_film")){
-                    real = new ArrayList<>();
-                    act = new ArrayList<>();
-                    autre_titres = new ArrayList<>();
-
-                } id_prec = rs.getInt("id_film");
 
             }
+            System.out.println(infoFilm.toString());
+
 
         }catch (SQLException e) {
             System.out.println(e.getMessage());
