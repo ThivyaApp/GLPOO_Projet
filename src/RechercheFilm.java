@@ -64,7 +64,7 @@ public class RechercheFilm {
      */
     public void lectureLigneUtilisateur(String TypedLine){
 
-        TypedLine.toLowerCase().replaceAll(" ou "," * ");
+        TypedLine = TypedLine.toLowerCase().replaceAll(" ou "," * ");
         ArrayList<String> typedLineArray = new ArrayList<String>();   //contient split de la ligne tapée par l'utilisateur
         ArrayList<String> temp_tab_nonnull = new ArrayList<>();          //contient split en fonction d'un espace des lignes de typedLineArray sans valeur null
         String[] temp_tab_null;   //contient split en fonction d'un espace des lignes de typedLineArray avec valeur null
@@ -244,7 +244,6 @@ public class RechercheFilm {
      * @param requete
      */
     public String retrouve(String requete){
-
         lectureLigneUtilisateur(requete);
         String code_SQL = constructionSQL();
         String param1="", param2="";
@@ -252,8 +251,8 @@ public class RechercheFilm {
         int limit100 = 1;
         ResultSet rs = null;
         actualiser_tab();
-        System.out.println(code_SQL);
 
+        System.out.println(code_SQL);
         //tableau contenant les mots-clés
         ArrayList<String> ligne = new ArrayList<>();
             for(int aa = 1 ; aa < tab_final.get(0).size() ; aa++){
@@ -261,7 +260,7 @@ public class RechercheFilm {
                 //System.out.println(tab_final.get(0).get(1));
             }
 
-        System.out.println(ligne);
+       // System.out.println(ligne);
         try(PreparedStatement pstmt  = conn.prepareStatement(code_SQL)) {
             for(int tab=0; tab<tab_final.size();tab++){
                 if(tab_final.get(tab).get(0).equals("titre")||
@@ -272,8 +271,9 @@ public class RechercheFilm {
                         (tab_final.get(tab).get(0).equals("après"))){
 
                     for(int sous_tab=1;sous_tab<tab_final.get(tab).size();sous_tab++){
-                        param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
+                        param1 = (param1 + " " + tab_final.get(tab).get(sous_tab)).trim();
                     }
+                    System.out.println(param1);
                     pstmt.setString(k, param1);
                     if((tab_final.get(tab).get(0).equals("pays"))) pstmt.setString(k+1, param1);
 
@@ -304,6 +304,8 @@ public class RechercheFilm {
                         k++;
                         pstmt.setString(k, param1);
                         k++;
+                        System.out.println(param1);
+                        System.out.println(param2);
 
                         if(tab < tab_final.size() -1) {
                             if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
@@ -314,6 +316,7 @@ public class RechercheFilm {
                             } else {
                                 pstmt.setString(k, "");
                             }
+                            //System.out.println("je passe");
                         }
                         rs = pstmt.executeQuery();
                         param1 = "";

@@ -14,8 +14,8 @@ public class TestProjet {
          }*/
 
          try {
-              RechercheFilm rf = new RechercheFilm("C:\\Users\\Thivya A\\Desktop\\ProjetGLPOO2\\bdfilm.sqlite\\bdfilm.sqlite");
-              System.out.println(rf.retrouve("avec kajol"));
+              RechercheFilm rf = new RechercheFilm("/Users/douglaslopeze/IdeaProjects/GLPOO_Projet/bdfilm.sqlite");
+              System.out.println(rf.retrouve("avec snoop dogg"));
               rf.fermeBase();
           } catch (Exception e) {
              System.err.println("Exception caught:" + e.toString());
