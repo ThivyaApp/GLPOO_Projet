@@ -117,6 +117,8 @@ public class RechercheFilm {
         int j = 0;
         String SQL = "with filtre as(\n";
 
+        //System.out.println("sep size = " + sep.size());
+
         if(sep.size() == 0){
             SQL += etudeParametre(tab_final.get(0).get(0));
         } else {
@@ -132,6 +134,10 @@ public class RechercheFilm {
                         && !cond1.equals("titre") && !cond1.equals("en") && !cond1.equals("apres") && j > 0)
                     cond1 = tab_final.get(j - 1).get(0);
 
+                // debug
+
+                //System.out.println(bleu + cond1);
+                //System.out.println(jaune + cond2 + blanc);
 
                 if (sep.get(i).equals(",")) {
                     if ((i == 0 && sep.size() > 1) || (i < sep.size() - 1)) { // Si il est le premier et qu'il n'est pas le seul séparateur OU qu'il est au milieu
@@ -159,7 +165,7 @@ public class RechercheFilm {
         }
 
         SQL+=   ")\n" +
-                "select f.id_film, f.titre , py.nom, f.annee, f.duree, \n" +
+                "select f.id_film, f.titre , f.pays, f.annee, f.duree, \n" +
                 "group_concat(a.titre) as autres_titres,\n" +
                 "p.prenom, p.nom, g.role\n" +
                 "from filtre\n" +
@@ -173,7 +179,7 @@ public class RechercheFilm {
                 "\ton g.id_film = f.id_film\n" +
                 "\tjoin personnes p\n" +
                 "\ton p.id_personne = g.id_personne\n" +
-                "\tgroup by f.id_film, f.titre , py.nom, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
+                "\tgroup by f.id_film, f.titre , f.pays, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
                 "\tLIMIT 100;";
 
         return SQL;
@@ -245,6 +251,7 @@ public class RechercheFilm {
         int i=0, j, k = 1;
         ResultSet rs = null;
         actualiser_tab();
+        System.out.println(code_SQL);
 
         //tableau contenant les mots-clés
         ArrayList<String> ligne = new ArrayList<>();
@@ -256,7 +263,7 @@ public class RechercheFilm {
         try(PreparedStatement pstmt  = conn.prepareStatement(code_SQL)) {
             for(int tab=0; tab<tab_final.size();tab++){
                 if(tab_final.get(tab).get(0).equals("titre")||
-                        (tab_final.get(tab).get(0).equals("pays"))||
+                        //(tab_final.get(tab).get(0).equals("pays"))||
                         (tab_final.get(tab).get(0).equals("en"))||
                         (tab_final.get(tab).get(0).equals("avant"))||
                         (tab_final.get(tab).get(0).equals("apres"))||
@@ -270,7 +277,7 @@ public class RechercheFilm {
                     k++;
 
                     if(tab < tab_final.size() -1) {
-                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") ||(tab_final.get(tab+1).get(0).equals("pays"))) {
                             pstmt.setString(k, "");
                             pstmt.setString(k + 1, "");
                             pstmt.setString(k + 2, "");
@@ -295,7 +302,7 @@ public class RechercheFilm {
                         k++;
 
                         if(tab < tab_final.size() -1) {
-                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
+                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") || (tab_final.get(tab+1).get(0).equals("pays"))) {
                                 pstmt.setString(k, "");
                                 pstmt.setString(k + 1, "");
                                 pstmt.setString(k + 2, "");
@@ -314,12 +321,51 @@ public class RechercheFilm {
                 rs = pstmt.executeQuery();
             }
 
+            int id_prec = rs.getInt("id_film");
+            int wait = 0, size = -1;
+            ArrayList<NomPersonne> real = new ArrayList<>();
+            ArrayList<NomPersonne> act = new ArrayList<>();
+            ArrayList<String> autre_titres = new ArrayList<>();
+            InfoFilm infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
+
+
+            //System.out.println(id);
+
             while (rs.next()){
-                System.out.println(rs.getInt("id_film") + "\t" +
-                        rs.getString("nom") +  "\t" +
+               /* System.out.println(rs.getInt("id_film") + "\t" +
+                        rs.getString("pays") +  "\t" +
                         rs.getString("titre") +  "\t" +
-                        rs.getString("prenom") + "\t");
+                        rs.getString("prenom") + "\t" +
+                        rs.getString("nom") + "\t" +
+                        rs.getString("role") + "\t" +
+                        rs.getString("autres_titres") + "\t");*/
+                if(id_prec != rs.getInt("id_film")){
+                    real = new ArrayList<>();
+                    act = new ArrayList<>();
+                    autre_titres = new ArrayList<>();
+                    System.out.println(infoFilm.toString());
+                } id_prec = rs.getInt("id_film");
+
+                if("R".equals(rs.getString("role"))){
+                    NomPersonne nomPersonneR = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
+                    real.add(nomPersonneR);
+                }
+                else if("A".equals(rs.getString("role"))){
+                    NomPersonne nomPersonneA = new NomPersonne(rs.getString("nom"), rs.getString("prenom"));
+                    act.add(nomPersonneA);
+                }
+
+                if(rs.getString("autres_titres") != null )
+                    if(autre_titres.size() == 0){
+                        autre_titres.addAll(Arrays.asList(rs.getString("autres_titres").split(",")));
+                    }
+                infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
+                //System.out.println("je passe");
+
             }
+            System.out.println(infoFilm.toString());
+
+
         }catch (SQLException e) {
             System.out.println(e.getMessage());
         }
