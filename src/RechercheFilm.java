@@ -179,8 +179,8 @@ public class RechercheFilm {
                 "\ton g.id_film = f.id_film\n" +
                 "\tjoin personnes p\n" +
                 "\ton p.id_personne = g.id_personne\n" +
-                "\tgroup by f.id_film, f.titre , f.pays, f.annee, f.duree, p.prenom, p.nom, g.role\n" +
-                "\tLIMIT 100;";
+                "\tgroup by f.id_film, f.titre , f.pays, f.annee, f.duree, p.prenom, p.nom, g.role;";
+                //"\tLIMIT 100;";
 
         return SQL;
     }
@@ -249,6 +249,7 @@ public class RechercheFilm {
         String code_SQL = constructionSQL();
         String param1="", param2="";
         int i=0, j, k = 1;
+        int limit100 = 1;
         ResultSet rs = null;
         actualiser_tab();
         System.out.println(code_SQL);
@@ -257,13 +258,14 @@ public class RechercheFilm {
         ArrayList<String> ligne = new ArrayList<>();
             for(int aa = 1 ; aa < tab_final.get(0).size() ; aa++){
                 ligne.add(tab_final.get(0).get(aa));
+                //System.out.println(tab_final.get(0).get(1));
             }
 
-
+        System.out.println(ligne);
         try(PreparedStatement pstmt  = conn.prepareStatement(code_SQL)) {
             for(int tab=0; tab<tab_final.size();tab++){
                 if(tab_final.get(tab).get(0).equals("titre")||
-                        //(tab_final.get(tab).get(0).equals("pays"))||
+                        (tab_final.get(tab).get(0).equals("pays"))||
                         (tab_final.get(tab).get(0).equals("en"))||
                         (tab_final.get(tab).get(0).equals("avant"))||
                         (tab_final.get(tab).get(0).equals("apres"))||
@@ -273,11 +275,13 @@ public class RechercheFilm {
                         param1 = (param1 + tab_final.get(tab).get(sous_tab)).trim();
                     }
                     pstmt.setString(k, param1);
+                    if((tab_final.get(tab).get(0).equals("pays"))) pstmt.setString(k+1, param1);
+
                     param1 = "";
                     k++;
 
                     if(tab < tab_final.size() -1) {
-                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") ||(tab_final.get(tab+1).get(0).equals("pays"))) {
+                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
                             pstmt.setString(k, "");
                             pstmt.setString(k + 1, "");
                             pstmt.setString(k + 2, "");
@@ -302,7 +306,7 @@ public class RechercheFilm {
                         k++;
 
                         if(tab < tab_final.size() -1) {
-                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de") || (tab_final.get(tab+1).get(0).equals("pays"))) {
+                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
                                 pstmt.setString(k, "");
                                 pstmt.setString(k + 1, "");
                                 pstmt.setString(k + 2, "");
@@ -343,6 +347,7 @@ public class RechercheFilm {
                     real = new ArrayList<>();
                     act = new ArrayList<>();
                     autre_titres = new ArrayList<>();
+                    limit100++;
                     System.out.println(infoFilm.toString());
                 } id_prec = rs.getInt("id_film");
 
@@ -361,7 +366,7 @@ public class RechercheFilm {
                     }
                 infoFilm = new InfoFilm(rs.getString("titre"), real, act, rs.getString("pays") ,rs.getInt("annee"), rs.getInt("duree"), autre_titres);
                 //System.out.println("je passe");
-
+                if (limit100 == 100) break;
             }
             System.out.println(infoFilm.toString());
 
