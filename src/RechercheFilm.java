@@ -252,7 +252,7 @@ public class RechercheFilm {
         ResultSet rs = null;
         actualiser_tab();
 
-        System.out.println(code_SQL);
+       // System.out.println(code_SQL);
         //tableau contenant les mots-clés
         ArrayList<String> ligne = new ArrayList<>();
             for(int aa = 1 ; aa < tab_final.get(0).size() ; aa++){
@@ -292,9 +292,13 @@ public class RechercheFilm {
                     }
                 }else{
                     do{
+                        //System.out.println(i);
+                        //System.out.println(ligne.size());
                         for (j = 0; j < ligne.size(); j++) {
                             if (j <= i) param1 = (param1 + " " + ligne.get(j)).trim();
                             if (j > i) param2 = (param2 + " " + ligne.get(j)).trim();
+                            //System.out.println("je passe");
+
                         }
                         pstmt.setString(k, param1);
                         k++;
@@ -304,8 +308,9 @@ public class RechercheFilm {
                         k++;
                         pstmt.setString(k, param1);
                         k++;
-                        System.out.println(param1);
-                        System.out.println(param2);
+                       // System.out.println(ligne);
+                        //System.out.println(param1);
+                        //System.out.println(param2);
 
                         if(tab < tab_final.size() -1) {
                             if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
@@ -316,12 +321,12 @@ public class RechercheFilm {
                             } else {
                                 pstmt.setString(k, "");
                             }
-                            //System.out.println("je passe");
                         }
                         rs = pstmt.executeQuery();
                         param1 = "";
                         param2 = "";
                         if (i<ligne.size()) i++;
+                        k = 1;
                     } while (!rs.next() && i < ligne.size());
 
                 }

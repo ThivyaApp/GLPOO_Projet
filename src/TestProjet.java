@@ -15,7 +15,7 @@ public class TestProjet {
 
          try {
               RechercheFilm rf = new RechercheFilm("/Users/douglaslopeze/IdeaProjects/GLPOO_Projet/bdfilm.sqlite");
-              System.out.println(rf.retrouve("avec snoop dogg"));
+              System.out.println(rf.retrouve("avec shah rukh khan ou rihanna"));
               rf.fermeBase();
           } catch (Exception e) {
              System.err.println("Exception caught:" + e.toString());
