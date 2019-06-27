@@ -252,17 +252,20 @@ public class RechercheFilm {
         ResultSet rs = null;
         actualiser_tab();
 
-       // System.out.println(code_SQL);
+        System.out.println(code_SQL);
         //tableau contenant les mots-clés
         ArrayList<String> ligne = new ArrayList<>();
-            for(int aa = 1 ; aa < tab_final.get(0).size() ; aa++){
-                ligne.add(tab_final.get(0).get(aa));
-                //System.out.println(tab_final.get(0).get(1));
-            }
 
-       // System.out.println(ligne);
         try(PreparedStatement pstmt  = conn.prepareStatement(code_SQL)) {
             for(int tab=0; tab<tab_final.size();tab++){
+
+                ligne.clear();
+                for(int aa = 1 ; aa < tab_final.get(tab).size() ; aa++){
+                    ligne.add(tab_final.get(tab).get(aa));
+                    //System.out.println(tab_final.get(0).get(1));
+                }
+               System.out.println(ligne);
+
                 if(tab_final.get(tab).get(0).equals("titre")||
                         (tab_final.get(tab).get(0).equals("pays"))||
                         (tab_final.get(tab).get(0).equals("en"))||
@@ -291,6 +294,7 @@ public class RechercheFilm {
                         }
                     }
                 }else{
+                    int save = k;
                     do{
                         //System.out.println(i);
                         //System.out.println(ligne.size());
@@ -326,12 +330,13 @@ public class RechercheFilm {
                         param1 = "";
                         param2 = "";
                         if (i<ligne.size()) i++;
-                        k = 1;
+                        k = save;
                     } while (!rs.next() && i < ligne.size());
-
+                    k = save + 4;
                 }
-                rs = pstmt.executeQuery();
+                //k = 1;
             }
+                rs = pstmt.executeQuery();
 
             int id_prec = rs.getInt("id_film");
             int wait = 0, size = -1;
