@@ -263,16 +263,26 @@ public class RechercheFilm {
                     param1 = "";
                     k++;
 
-                    if(tab < tab_final.size() -1) {
-                        if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
-                            pstmt.setString(k, "");
-                            pstmt.setString(k + 1, "");
-                            pstmt.setString(k + 2, "");
-                            pstmt.setString(k + 3, "");
-                        } else {
-                            pstmt.setString(k, "");
+                    int save2 = k;
+                    for (int bb = 1 ; bb < tab_final.size(); bb++){
+                        if (tab + bb < tab_final.size()) {
+                            if (tab_final.get(tab + bb).get(0).equals("avec") || tab_final.get(tab + bb).get(0).equals("de")) {
+                                pstmt.setString(k, "");
+                                pstmt.setString(k + 1, "");
+                                pstmt.setString(k + 2, "");
+                                pstmt.setString(k + 3, "");
+                                k+=4;
+                            } else if (tab_final.get(tab + bb).get(0).equals("pays")) {
+                                pstmt.setString(k, "");
+                                pstmt.setString(k+1, "");
+                                k+=2;
+                            } else {
+                                pstmt.setString(k, "");
+                                k++;
+                            }
                         }
                     }
+                    k = save2;
                 }else{
                     save = k;
                     do{
@@ -289,16 +299,26 @@ public class RechercheFilm {
                         pstmt.setString(k, param1);
                         k++;
 
-                        if(tab < tab_final.size() -1) {
-                            if (tab_final.get(tab + 1).get(0).equals("avec") || tab_final.get(tab + 1).get(0).equals("de")) {
-                                pstmt.setString(k, "");
-                                pstmt.setString(k + 1, "");
-                                pstmt.setString(k + 2, "");
-                                pstmt.setString(k + 3, "");
-                            } else {
-                                pstmt.setString(k, "");
+                        int save2 = k;
+                        for (int bb = 1 ; bb < tab_final.size(); bb++){
+                            if (tab + bb < tab_final.size()) {
+                                if (tab_final.get(tab + bb).get(0).equals("avec") || tab_final.get(tab + bb).get(0).equals("de")) {
+                                    pstmt.setString(k, "");
+                                    pstmt.setString(k + 1, "");
+                                    pstmt.setString(k + 2, "");
+                                    pstmt.setString(k + 3, "");
+                                    k+=4;
+                                } else if (tab_final.get(tab + bb).get(0).equals("pays")) {
+                                    pstmt.setString(k, "");
+                                    pstmt.setString(k+1, "");
+                                    k+=2;
+                                } else {
+                                    pstmt.setString(k, "");
+                                    k++;
+                                }
                             }
                         }
+                        k = save2;
                         rs = pstmt.executeQuery();
                         param1 = "";
                         param2 = "";
